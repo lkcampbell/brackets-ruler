@@ -55,6 +55,10 @@ define(function (require, exports, module) {
     // Update ruler when changing editors
     
     // Load ruler HTML and style sheet
+//    inject ruler just above div id="editor-holder"
+//    this._$root = $("<div class='modal-bar'/>")
+//            .html(template)
+//            .insertBefore("#editor-holder");
     
     // Register command
     CommandManager.register(COMMAND_NAME, COMMAND_ID, _toggleRuler);

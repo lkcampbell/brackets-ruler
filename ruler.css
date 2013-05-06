@@ -1,0 +1,48 @@
+body {
+    font-size: 100%;
+    font-family: monospace;
+}
+
+.ruler {
+/*    border: solid 1px;*/
+    border-collapse: collapse;
+    background-color: #C0C0C0;
+}
+
+.numbers {
+/*    border: solid red 1px;*/
+    font-size: 70%;
+    font-weight: bold;
+/*    line-height: 0.5ex;*/
+}
+
+.number {
+/*    border: solid red 1px;*/
+    text-align: center;
+    padding: 0;
+}
+
+.tick-marks {
+/*    border: solid red 1px; */
+/*    white-space: nowrap;*/
+/*    line-height: 0.9ex;*/
+}
+
+.major-tick-mark {
+/*    border: solid red 1px;*/
+    padding: 0;
+    font-weight: bolder;
+}
+
+.minor-tick-mark {
+/*    border: solid red 1px;*/
+    padding: 0;
+    color: #808080;
+}
+
+/* Test text content */
+.test-text-content {
+    padding-left: 0.7ex;
+/*    margin-top: -2.2ex;*/
+    color: red;
+}
