@@ -1,35 +1,40 @@
-.ruler {
+#brackets-ruler {
+    font-size: 100%;
+    font-family: monospace;   
+}
+
+#brackets-ruler .ruler {
 /*    border: solid 1px;*/
     border-collapse: collapse;
     background-color: #C0C0C0;
 }
 
-.numbers {
-/*    border: solid red 1px;*/
+#brackets-ruler .numbers {
+/*    background-color: red;*/
     font-size: 70%;
     font-weight: bold;
 /*    line-height: 0.5ex;*/
 }
 
-.number {
+#brackets-ruler .numbers .number {
 /*    border: solid red 1px;*/
     text-align: center;
     padding: 0;
 }
 
-.tick-marks {
-/*    border: solid red 1px; */
+#brackets-ruler .tick-marks {
+/*    background-color: red;*/
 /*    white-space: nowrap;*/
 /*    line-height: 0.9ex;*/
 }
 
-.major-tick-mark {
+#brackets-ruler .major-tick-mark {
 /*    border: solid red 1px;*/
     padding: 0;
     font-weight: bolder;
 }
 
-.minor-tick-mark {
+#brackets-ruler .minor-tick-mark {
 /*    border: solid red 1px;*/
     padding: 0;
     color: #808080;
@@ -38,6 +43,8 @@
 /* Test text content */
 .test-text-content {
     padding-left: 0.7ex;
-/*    margin-top: -2.2ex;*/
+/*    margin-top: -2.4ex;*/
     color: red;
+    font-size: 100%;
+    font-family: monospace;
 }

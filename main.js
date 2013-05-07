@@ -23,7 +23,7 @@
  */
 
 /*jslint vars: true, plusplus: true, devel: true, regexp: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define, brackets, $ */
+/*global define, brackets, $, Mustache */
 
 define(function (require, exports, module) {
     "use strict";
@@ -38,20 +38,42 @@ define(function (require, exports, module) {
     // --- Constants ---
     var COMMAND_NAME    = "Toggle Ruler",
         COMMAND_ID      = "lkcampbell.toggle-ruler",
-        SHORTCUT_KEY    = "Ctrl-Alt-M";
+        SHORTCUT_KEY    = "Ctrl-Alt-R";
     
     // --- Local variables ---
     var _defPrefs   = { enabled: false },
         _prefs      = PreferencesManager.getPreferenceStorage(module, _defPrefs),
-        _viewMenu   = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU);
+        _viewMenu   = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
+        _rulerHTML  = require("text!ruler.html"),
+        $rulerPanel = null;
     
     // --- Private Functions ---
-    function _updateRuler() {
-        console.log("Called _loadRuler()...");
+    function _createRuler() {
+        console.log("Called _createRuler()...");
+        $rulerPanel = $(_rulerHTML);
+        $("#editor-holder").before($rulerPanel);
     }
     
-    function _displayRuler() {
-        console.log("Called _displayRuler()...");
+    function _updateRuler() {
+        console.log("Called _updateRuler()...");
+        
+        if (!$rulerPanel) {
+            _createRuler();
+        }
+    }
+    
+    function _showRuler() {
+        console.log("Called _showRuler()...");
+        if ($rulerPanel.is(":hidden")) {
+            $rulerPanel.show();
+        }
+    }
+    
+    function _hideRuler() {
+        console.log("Called _hideRuler()...");
+        if ($rulerPanel.is(":visible")) {
+            $rulerPanel.hide();
+        }
     }
     
     // --- Event handlers ---
@@ -59,12 +81,16 @@ define(function (require, exports, module) {
         var command         = CommandManager.get(COMMAND_ID),
             rulerEnabled    = !command.getChecked();
         
+        console.log("Called _toggleRuler()...");
+        
         command.setChecked(rulerEnabled);
         _prefs.setValue("enabled", rulerEnabled);
         
         if (rulerEnabled) {
             _updateRuler();
-            _displayRuler();
+            _showRuler();
+        } else {
+            _hideRuler();
         }
     }
     
@@ -89,7 +115,7 @@ define(function (require, exports, module) {
         // If the ruler is enabled, load HTML and display
         if (rulerEnabled) {
             _updateRuler();
-            _displayRuler();
+            _showRuler();
         }
     });
 });
