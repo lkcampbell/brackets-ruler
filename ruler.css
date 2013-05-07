@@ -8,7 +8,6 @@
     border: 0;
     font-size: 100%;
     font: inherit;
-    vertical-align: baseline;
 }
 
 #brackets-ruler table {
@@ -29,6 +28,10 @@
 
 #brackets-ruler .number {
     text-align: center;
+}
+
+#brackets-ruler .tick-marks {
+    line-height: 0.75ex;
 }
 
 #brackets-ruler .major-tick-mark {
