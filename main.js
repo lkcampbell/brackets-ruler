@@ -23,7 +23,7 @@
  */
 
 /*jslint vars: true, plusplus: true, devel: true, regexp: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define, brackets */
+/*global define, brackets, $ */
 
 define(function (require, exports, module) {
     "use strict";
@@ -31,7 +31,9 @@ define(function (require, exports, module) {
     // --- Required modules ---
     var PreferencesManager  = brackets.getModule("preferences/PreferencesManager"),
         Menus               = brackets.getModule("command/Menus"),
-        CommandManager      = brackets.getModule("command/CommandManager");
+        CommandManager      = brackets.getModule("command/CommandManager"),
+        AppInit             = brackets.getModule("utils/AppInit"),
+        ExtensionUtils      = brackets.getModule("utils/ExtensionUtils");
     
     // --- Constants ---
     var COMMAND_NAME    = "Toggle Ruler",
@@ -42,32 +44,52 @@ define(function (require, exports, module) {
     var _defPrefs   = { enabled: false },
         _prefs      = PreferencesManager.getPreferenceStorage(module, _defPrefs),
         _viewMenu   = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU);
-
+    
+    // --- Private Functions ---
+    function _updateRuler() {
+        console.log("Called _loadRuler()...");
+    }
+    
+    function _displayRuler() {
+        console.log("Called _displayRuler()...");
+    }
+    
     // --- Event handlers ---
     function _toggleRuler() {
-        var command = CommandManager.get(COMMAND_ID);
+        var command         = CommandManager.get(COMMAND_ID),
+            rulerEnabled    = !command.getChecked();
         
-        command.setChecked(!command.getChecked());
-        _prefs.setValue("enabled", command.getChecked());
-        alert("Ruler implementation goes here.");
+        command.setChecked(rulerEnabled);
+        _prefs.setValue("enabled", rulerEnabled);
+        
+        if (rulerEnabled) {
+            _updateRuler();
+            _displayRuler();
+        }
     }
     
-    // Update ruler when changing editors
-    
-    // Load ruler HTML and style sheet
-//    inject ruler just above div id="editor-holder"
-//    this._$root = $("<div class='modal-bar'/>")
-//            .html(template)
-//            .insertBefore("#editor-holder");
-    
-    // Register command
-    CommandManager.register(COMMAND_NAME, COMMAND_ID, _toggleRuler);
-    
-    // Add to View menu
-    if (_viewMenu) {
-        _viewMenu.addMenuItem(COMMAND_ID, SHORTCUT_KEY);
-    }
-    
-    // Apply preferences
-    CommandManager.get(COMMAND_ID).setChecked(_prefs.getValue("enabled"));
+    // --- Initialize Extension ---
+    AppInit.appReady(function () {
+        var rulerEnabled = _prefs.getValue("enabled");
+        
+        // Load ruler style sheet
+        ExtensionUtils.loadStyleSheet(module, "ruler.css");
+        
+        // Register command
+        CommandManager.register(COMMAND_NAME, COMMAND_ID, _toggleRuler);
+        
+        // Add to View menu
+        if (_viewMenu) {
+            _viewMenu.addMenuItem(COMMAND_ID, SHORTCUT_KEY);
+        }
+        
+        // Apply preferences
+        CommandManager.get(COMMAND_ID).setChecked(rulerEnabled);
+        
+        // If the ruler is enabled, load HTML and display
+        if (rulerEnabled) {
+            _updateRuler();
+            _displayRuler();
+        }
+    });
 });
