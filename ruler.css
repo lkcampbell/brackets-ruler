@@ -1,9 +1,25 @@
-#brackets-ruler {
-    font-size: 100%;
-    font-family: monospace;
-    border-collapse: collapse;
-    background-color: #C0C0C0;
+/* Reset all table attributes */
+#brackets-ruler table,
+#brackets-ruler tbody,
+#brackets-ruler tr,
+#brackets-ruler td {
     margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+#brackets-ruler table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* Ruler styles */
+#brackets-ruler #ruler {
+    font-family: monospace;
+    background-color: #C0C0C0;
 }
 
 #brackets-ruler .numbers {
@@ -11,20 +27,14 @@
     font-weight: bold;
 }
 
-#brackets-ruler .numbers .number {
-    border:none;
+#brackets-ruler .number {
     text-align: center;
-    padding: 0;
 }
 
 #brackets-ruler .major-tick-mark {
-    border:none;
-    padding: 0;
     font-weight: bolder;
 }
 
 #brackets-ruler .minor-tick-mark {
-    border:none;
-    padding: 0;
     color: #808080;
 }
