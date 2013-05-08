@@ -22,7 +22,7 @@
 }
 
 #brackets-ruler .numbers {
-    font-size: 70%;
+    font-size: 80%;
     font-weight: bold;
     color: #fff;
 }
@@ -41,5 +41,5 @@
 }
 
 #brackets-ruler .minor-tick-mark {
-    color: #808080;
+    color: #8E9A9D;
 }
