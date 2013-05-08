@@ -1,8 +1,14 @@
-<table id="brackets-ruler">
-    <tr class="numbers">
-        {{ numbers }}
-    </tr>
-    <tr class="tick-marks">
-        {{ tick-marks }}
-    </tr>
-</table> 
+<div id="brackets-ruler">
+    <table id="ruler">
+        <tbody>
+            <tr class="numbers">
+                <td class="number">0</td>
+                <td class="number" colspan="5"></td>
+{{{rulerNumber}}}
+            </tr>
+            <tr class="tick-marks">
+{{{rulerTickMark}}}
+            </tr>
+        </tbody>
+    </table>
+</div>

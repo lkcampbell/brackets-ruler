@@ -42,17 +42,66 @@ define(function (require, exports, module) {
         COMMAND_ID      = "lkcampbell.toggle-ruler",
         SHORTCUT_KEY    = "Ctrl-Alt-R";
     
+    var MAX_COLUMNS     = 80;
+    
     // --- Local variables ---
-    var _defPrefs   = { enabled: false },
-        _prefs      = PreferencesManager.getPreferenceStorage(module, _defPrefs),
-        _viewMenu   = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
-        _rulerHTML  = require("text!ruler.html"),
-        $rulerPanel = null;
+    var _defPrefs       = { enabled: false },
+        _prefs          = PreferencesManager.getPreferenceStorage(module, _defPrefs),
+        _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
+        _rulerHTML      = require("text!ruler-template.html"),
+        $rulerPanel     = null;
+    
+    var _templateFunctions = {
+        "rulerNumber": function () {
+            var i           = 0,
+                finalHTML   = '';
+            
+            for (i = 10; i <= MAX_COLUMNS; i += 10) {
+                finalHTML += '                ';
+                finalHTML += '<td class="number" colspan="9">';
+                finalHTML += i;
+                finalHTML += '</td>';
+                
+                if (i !== MAX_COLUMNS) {
+                    finalHTML += '\n';
+                    finalHTML += '                ';
+                    finalHTML += '<td class="number"></td>';
+                    finalHTML += '\n';
+                }
+            }
+            return finalHTML;
+        },
+        "rulerTickMark": function () {
+            var i           = 0,
+                finalHTML   = '';
+            
+            for (i = 0; i <= MAX_COLUMNS; i++) {
+                finalHTML += '                ';
+                
+                if (i % 5) {
+                    // Minor tick mark
+                    finalHTML += '<td class="minor-tick-mark" id="';
+                    finalHTML += i;
+                    finalHTML += '">|</td>';
+                } else {
+                    // Major tick mark
+                    finalHTML += '<td class="major-tick-mark" id="';
+                    finalHTML += i;
+                    finalHTML += '">|</td>';
+                }
+                
+                if (i !== MAX_COLUMNS) {
+                    finalHTML += '\n';
+                }
+            }
+            return finalHTML;
+        }
+    };
     
     // --- Private Functions ---
     function _createRuler() {
         console.log("Called _createRuler()...");
-        $rulerPanel = $(_rulerHTML);
+        $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
         $("#editor-holder").before($rulerPanel);
     }
     
