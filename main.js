@@ -31,8 +31,10 @@ define(function (require, exports, module) {
     // --- Required modules ---
     var PreferencesManager  = brackets.getModule("preferences/PreferencesManager"),
         Menus               = brackets.getModule("command/Menus"),
+        EditorManager       = brackets.getModule("editor/EditorManager"),
         CommandManager      = brackets.getModule("command/CommandManager"),
         AppInit             = brackets.getModule("utils/AppInit"),
+        DocumentManager     = brackets.getModule("document/DocumentManager"),
         ExtensionUtils      = brackets.getModule("utils/ExtensionUtils");
     
     // --- Constants ---
@@ -54,19 +56,12 @@ define(function (require, exports, module) {
         $("#editor-holder").before($rulerPanel);
     }
     
-    function _updateRuler() {
-        console.log("Called _updateRuler()...");
-        
-        if (!$rulerPanel) {
-            _createRuler();
-        }
-    }
-    
     function _showRuler() {
         console.log("Called _showRuler()...");
         if ($rulerPanel.is(":hidden")) {
             $rulerPanel.show();
         }
+        EditorManager.resizeEditor();
     }
     
     function _hideRuler() {
@@ -74,9 +69,15 @@ define(function (require, exports, module) {
         if ($rulerPanel.is(":visible")) {
             $rulerPanel.hide();
         }
+        EditorManager.resizeEditor();
     }
     
     // --- Event handlers ---
+    function _updateRuler() {
+        console.log("Called _updateRuler()...");
+        // *****TODO**** MIGHT need a call to EditorManager.resizeEditor() later on
+    }
+    
     function _toggleRuler() {
         var command         = CommandManager.get(COMMAND_ID),
             rulerEnabled    = !command.getChecked();
@@ -87,7 +88,6 @@ define(function (require, exports, module) {
         _prefs.setValue("enabled", rulerEnabled);
         
         if (rulerEnabled) {
-            _updateRuler();
             _showRuler();
         } else {
             _hideRuler();
@@ -98,9 +98,6 @@ define(function (require, exports, module) {
     AppInit.appReady(function () {
         var rulerEnabled = _prefs.getValue("enabled");
         
-        // Load ruler style sheet
-        ExtensionUtils.loadStyleSheet(module, "ruler.css");
-        
         // Register command
         CommandManager.register(COMMAND_NAME, COMMAND_ID, _toggleRuler);
         
@@ -109,13 +106,28 @@ define(function (require, exports, module) {
             _viewMenu.addMenuItem(COMMAND_ID, SHORTCUT_KEY);
         }
         
-        // Apply preferences
+        // Apply user preferences
         CommandManager.get(COMMAND_ID).setChecked(rulerEnabled);
         
-        // If the ruler is enabled, load HTML and display
-        if (rulerEnabled) {
-            _updateRuler();
-            _showRuler();
-        }
+        // Add event listeners for updating the ruler
+        $(DocumentManager).on("currentDocumentChange", _updateRuler);
+        
+        // *****TODO**** Need an event listener for font size adjustment
+        // *****TODO**** MIGHT need an event listener for horizontal scroll
+        // *****TODO**** MIGHT need an event listener for addition of characters
+        //               What fires off when the column number increases?
+        
+        // Load the ruler CSS -- when done, create the ruler UI
+        ExtensionUtils.loadStyleSheet(module, "ruler.css")
+            .done(function () {
+                _createRuler();
+                _updateRuler();
+                
+                if (rulerEnabled) {
+                    _showRuler();
+                } else {
+                    _hideRuler();
+                }
+            });
     });
 });
