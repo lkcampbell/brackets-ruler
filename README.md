@@ -18,10 +18,19 @@ Toggle the extension with **Brackets > View > Toggle Ruler** or use the
 shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
 ### Roadmap
-* Create ruler
-* Create column guide on ruler click
-* Make column guide draggable
-* Option for word wrap at column guide
+* Column Ruler
+    * Increase tick marks to match font size
+    * Hook in update ruler event for increase/decrease font size
+    * Hook in update ruler event for increase/decrease document width
+    * Conditional code for updating ruler: gutter size, font size, document width
+    * Sync up editor scrolling and ruler scrolling
+* Column guide
+    * Create UI
+    * Hook in Click event to toggle guide
+    * Hook in Drag event to move guide left and right
+    * Create UI for word wrap guide
+    * Hook in Click and Double Click event to toggle word wrap guide
+    * Hook word wrap guide to current Brackets word wrap code
 
 ### License
 MIT-licensed -- see `main.js` for details.
