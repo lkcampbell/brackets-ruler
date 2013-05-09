@@ -40,11 +40,10 @@ define(function (require, exports, module) {
     // --- Constants ---
     var COMMAND_NAME    = "Toggle Ruler",
         COMMAND_ID      = "lkcampbell.toggle-ruler",
-        SHORTCUT_KEY    = "Ctrl-Alt-R";
+        SHORTCUT_KEY    = "Ctrl-Alt-R",
+        MAX_COLUMNS     = 240;
     
-    var MAX_COLUMNS     = 240;
-    
-    // --- Local variables ---
+    // --- Private variables ---
     var _defPrefs       = { enabled: false },
         _prefs          = PreferencesManager.getPreferenceStorage(module, _defPrefs),
         _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
@@ -97,7 +96,8 @@ define(function (require, exports, module) {
             return finalHTML;
         }
     };
-    
+      
+    // --- Private functions ---
     function _updateZeroTickMark() {
         var fullEditor  = null,
             codeMirror  = null,
@@ -123,12 +123,14 @@ define(function (require, exports, module) {
     function _showRuler() {
         if ($rulerPanel.is(":hidden")) {
             $rulerPanel.show();
+            EditorManager.resizeEditor();
         }
     }
     
     function _hideRuler() {
         if ($rulerPanel.is(":visible")) {
             $rulerPanel.hide();
+            EditorManager.resizeEditor();
         }
     }
     
@@ -145,13 +147,10 @@ define(function (require, exports, module) {
         _prefs.setValue("enabled", rulerEnabled);
         
         if (rulerEnabled) {
-            _updateRuler();
             _showRuler();
         } else {
             _hideRuler();
         }
-        
-        EditorManager.resizeEditor();
     }
     
     // --- Initialize Extension ---
@@ -171,25 +170,18 @@ define(function (require, exports, module) {
         
         // Add event listeners for updating the ruler
         $(DocumentManager).on("currentDocumentChange", _updateRuler);
-        
-        // *****TODO**** Need an event listener for font size adjustment
-        // *****TODO**** MIGHT need an event listener for horizontal scroll
-        // *****TODO**** MIGHT need an event listener for addition of characters
-        //               What fires off when the column number increases?
-        
-        // Load the ruler CSS -- when done, create the ruler UI
+
+        // Load the ruler CSS -- when done, create the ruler
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
                 _createRuler();
+                _updateRuler();
                 
                 if (rulerEnabled) {
-                    _updateRuler();
                     _showRuler();
                 } else {
                     _hideRuler();
                 }
-                
-                EditorManager.resizeEditor();
             });
     });
 });
