@@ -101,8 +101,8 @@ define(function (require, exports, module) {
     function _updateZeroTickMark() {
         var fullEditor  = null,
             codeMirror  = null,
-            gutterWidth = "",
-            $ruler      = null;
+            $ruler      = $("#brackets-ruler #ruler"),
+            gutterWidth = "";
         
         // Line up the zero tick mark with the editor gutter
         fullEditor = EditorManager.getCurrentFullEditor();
@@ -110,8 +110,9 @@ define(function (require, exports, module) {
         
         if (codeMirror) {
             gutterWidth = $(codeMirror.getGutterElement()).css("width");
-            $ruler      = $("#brackets-ruler #ruler");
             $ruler.css("left", gutterWidth);
+        } else {
+            $ruler.css("left", "0px");
         }
     }
     
@@ -170,7 +171,7 @@ define(function (require, exports, module) {
         
         // Add event listeners for updating the ruler
         $(DocumentManager).on("currentDocumentChange", _updateRuler);
-
+        
         // Load the ruler CSS -- when done, create the ruler
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
