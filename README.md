@@ -19,7 +19,7 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
 ### Roadmap
 * Column Ruler
-    * Line up zero tick mark with editor gutter
+    * Line up zero tick mark with editor gutter (off by a pixel or two)
     * Increase tick marks to match font size
     * Hook in update ruler event for increase/decrease font size
     * Hook in update ruler event for increase/decrease document width
