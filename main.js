@@ -81,12 +81,12 @@ define(function (require, exports, module) {
                     // Minor tick mark
                     finalHTML += '<td class="minor-tick-mark" id="';
                     finalHTML += i;
-                    finalHTML += '">|</td>';
+                    finalHTML += '">%nbsp;</td>';
                 } else {
                     // Major tick mark
                     finalHTML += '<td class="major-tick-mark" id="';
                     finalHTML += i;
-                    finalHTML += '">|</td>';
+                    finalHTML += '">%nbsp;</td>';
                 }
                 
                 if (i !== MAX_COLUMNS) {

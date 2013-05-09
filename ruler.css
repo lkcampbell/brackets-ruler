@@ -10,6 +10,7 @@
     font: inherit;
 }
 
+/* Ruler styles */
 #brackets-ruler {
     background-color: #3C3F41;
 }
@@ -21,12 +22,7 @@
 }
 
 /* Ruler styles */
-#brackets-ruler #ruler {
-    font-family: monospace;
-}
-
 #brackets-ruler .numbers {
-    font-size: 80%;
     font-weight: bold;
     color: #fff;
 }
@@ -36,14 +32,24 @@
 }
 
 #brackets-ruler .tick-marks {
-    line-height: 0.75ex;
-    color: #fff;
+    font-family: 'SourceCodePro';
+    line-height: 0;
 }
 
-#brackets-ruler .major-tick-mark {
-    font-weight: bolder;
+#brackets-ruler .major-tick-mark:before,
+#brackets-ruler .minor-tick-mark:before {
+    content: "";
+    position: relative;
+    display: block;
+    left: 50%;
+    height: 5px;
+    width: 1px;
 }
 
-#brackets-ruler .minor-tick-mark {
-    color: #8E9A9D;
+#brackets-ruler .major-tick-mark:before {
+    background-color: #FFFFFF;
+}
+
+#brackets-ruler .minor-tick-mark:before {
+    background-color: #8E9A9D;
 }
