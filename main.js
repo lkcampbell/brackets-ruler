@@ -42,7 +42,7 @@ define(function (require, exports, module) {
         COMMAND_ID      = "lkcampbell.toggle-ruler",
         SHORTCUT_KEY    = "Ctrl-Alt-R";
     
-    var MAX_COLUMNS     = 80;
+    var MAX_COLUMNS     = 240;
     
     // --- Local variables ---
     var _defPrefs       = { enabled: false },
@@ -98,49 +98,60 @@ define(function (require, exports, module) {
         }
     };
     
-    // --- Private Functions ---
+    function _updateZeroTickMark() {
+        var fullEditor  = null,
+            codeMirror  = null,
+            gutterWidth = "",
+            $ruler      = null;
+        
+        // Line up the zero tick mark with the editor gutter
+        fullEditor = EditorManager.getCurrentFullEditor();
+        codeMirror = fullEditor ? fullEditor._codeMirror : null;
+        
+        if (codeMirror) {
+            gutterWidth = $(codeMirror.getGutterElement()).css("width");
+            $ruler      = $("#brackets-ruler #ruler");
+            $ruler.css("left", gutterWidth);
+        }
+    }
+    
     function _createRuler() {
-        console.log("Called _createRuler()...");
         $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
         $("#editor-holder").before($rulerPanel);
     }
     
     function _showRuler() {
-        console.log("Called _showRuler()...");
         if ($rulerPanel.is(":hidden")) {
             $rulerPanel.show();
         }
-        EditorManager.resizeEditor();
     }
     
     function _hideRuler() {
-        console.log("Called _hideRuler()...");
         if ($rulerPanel.is(":visible")) {
             $rulerPanel.hide();
         }
-        EditorManager.resizeEditor();
     }
     
     // --- Event handlers ---
     function _updateRuler() {
-        console.log("Called _updateRuler()...");
-        // *****TODO**** MIGHT need a call to EditorManager.resizeEditor() later on
+        _updateZeroTickMark();
     }
     
     function _toggleRuler() {
         var command         = CommandManager.get(COMMAND_ID),
             rulerEnabled    = !command.getChecked();
         
-        console.log("Called _toggleRuler()...");
-        
         command.setChecked(rulerEnabled);
         _prefs.setValue("enabled", rulerEnabled);
         
         if (rulerEnabled) {
+            _updateRuler();
             _showRuler();
         } else {
             _hideRuler();
         }
+        
+        EditorManager.resizeEditor();
     }
     
     // --- Initialize Extension ---
@@ -170,13 +181,15 @@ define(function (require, exports, module) {
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
                 _createRuler();
-                _updateRuler();
                 
                 if (rulerEnabled) {
+                    _updateRuler();
                     _showRuler();
                 } else {
                     _hideRuler();
                 }
+                
+                EditorManager.resizeEditor();
             });
     });
 });

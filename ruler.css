@@ -10,15 +10,19 @@
     font: inherit;
 }
 
+#brackets-ruler {
+    background-color: #3C3F41;
+}
+
 #brackets-ruler table {
     border-collapse: collapse;
     border-spacing: 0;
+    position: relative;
 }
 
 /* Ruler styles */
 #brackets-ruler #ruler {
     font-family: monospace;
-    background-color: #3C3F41;
 }
 
 #brackets-ruler .numbers {
