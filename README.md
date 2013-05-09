@@ -36,4 +36,4 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 MIT-licensed -- see `main.js` for details.
 
 ### Compatibility
-Brackets Sprint 22 or later.
+Tested on Brackets Sprint 25 and later, Windows 7.
