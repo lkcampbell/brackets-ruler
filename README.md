@@ -25,6 +25,7 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
     * Hook in update ruler event for increase/decrease document width
     * Conditional code for updating ruler: gutter size, font size, document width
     * Sync up editor scrolling and ruler scrolling
+    * Cleanup ruler HTML code using jQuery
 * Column guide
     * Create UI
     * Hook in Click event to toggle guide
