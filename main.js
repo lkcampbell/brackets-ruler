@@ -116,6 +116,13 @@ define(function (require, exports, module) {
         }
     }
     
+    function _updateTickMarkSpacing() {
+        var fontSize    = $(".CodeMirror").css("font-size"),
+            $tickMarks  = $("#brackets-ruler .tick-marks");
+        
+        $tickMarks.css("font-size", fontSize);
+    }
+    
     function _createRuler() {
         $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
         $("#editor-holder").before($rulerPanel);
@@ -138,6 +145,7 @@ define(function (require, exports, module) {
     // --- Event handlers ---
     function _updateRuler() {
         _updateZeroTickMark();
+        _updateTickMarkSpacing();
     }
     
     function _toggleRuler() {
