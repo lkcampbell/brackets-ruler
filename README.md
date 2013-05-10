@@ -19,13 +19,12 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
 ### Roadmap
 * Column Ruler
-    * Line up zero tick mark with editor gutter
     * Hook in update ruler event for increase/decrease font size
     * At font size <12, ruler numbers need to decrease font size as well
-    * Hook in update ruler event for increase/decrease document width
+    * Line up zero tick mark with editor gutter
+    * Hook in create and update ruler event for increase/decrease document width
     * Conditional code for updating ruler: gutter size, font size, document width
     * Sync up editor scrolling and ruler scrolling
-    * Cleanup ruler HTML code using jQuery
 * Column guide
     * Create UI
     * Hook in Click event to toggle guide
@@ -33,6 +32,9 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
     * Create UI for word wrap guide
     * Hook in Click and Double Click event to toggle word wrap guide
     * Hook word wrap guide to current Brackets word wrap code
+* Nice But Not Necessary
+    * Clean up ruler HTML code using jQuery
+    * Changed CSS to LESS    
 
 ### License
 MIT-licensed -- see `main.js` for details.
