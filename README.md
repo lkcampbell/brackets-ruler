@@ -19,8 +19,9 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
 ### Roadmap
 * Column Ruler
-    * Line up zero tick mark with editor gutter (off by a pixel or two)
+    * Line up zero tick mark with editor gutter
     * Hook in update ruler event for increase/decrease font size
+    * At font size <12, ruler numbers need to decrease font size as well
     * Hook in update ruler event for increase/decrease document width
     * Conditional code for updating ruler: gutter size, font size, document width
     * Sync up editor scrolling and ruler scrolling
