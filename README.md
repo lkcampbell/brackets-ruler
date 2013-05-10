@@ -18,23 +18,36 @@ Toggle the extension with **Brackets > View > Toggle Ruler** or use the
 shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
 ### Roadmap
+
 * Column Ruler
-    * Hook in update ruler event for increase/decrease font size
-    * At font size <12, ruler numbers need to decrease font size as well
-    * Line up zero tick mark with editor gutter
-    * Hook in create and update ruler event for increase/decrease document width
-    * Conditional code for updating ruler: gutter size, font size, document width
-    * Sync up editor scrolling and ruler scrolling
+  * Event listener for adjust font size event to update ruler
+     * Brackets doesn't have this event; find a way to do this in CodeMirror
+  * At font size less than 12, ruler numbers need to decrease font size as well
+  * Line up zero tick mark with editor gutter
+  * Research: At runtime, what values are needed for calculation?
+  * Run Dev Tools to see exact values using small, normal, and large font sizes
+  * Hook in create and update ruler event for increase/decrease document width
+     * Research: How to get longest line or widest visible column
+     * Research: What happens to these values during word wrap?
+     * Have a minimum width that runs off of the editor screen always
+     * Using jQuery, add or remove one `<td>` for each character change
+  * Conditional code for updating ruler: gutter size, font size, document width
+  * Sync up editor scrolling and ruler scrolling
+
 * Column guide
-    * Create UI
-    * Hook in Click event to toggle guide
-    * Hook in Drag event to move guide left and right
-    * Create UI for word wrap guide
-    * Hook in Click and Double Click event to toggle word wrap guide
-    * Hook word wrap guide to current Brackets word wrap code
+   * Create UI
+   * Hook in Click event to toggle guide
+      * Hook in Drag event to move guide left and right
+      * Create UI for word wrap guide
+      * Hook in Click and Double Click event to toggle word wrap guide
+      * Hook word wrap guide to current Brackets word wrap code
+  
 * Nice But Not Necessary
-    * Clean up ruler HTML code using jQuery
-    * Changed CSS to LESS    
+   * Clean up ruler HTML-generator code using jQuery
+   * Changed CSS to LESS (proper namespacing of styles)
+   * Make sure ruler plays nicely with Themes extension
+   * When adjust font size event pull request accepted, update code to use it
+      * Create pull request in Brackets for firing adjust font size event
 
 ### License
 MIT-licensed -- see `main.js` for details.

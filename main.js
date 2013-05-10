@@ -73,18 +73,18 @@ define(function (require, exports, module) {
         "rulerTickMark": function () {
             var i           = 0,
                 finalHTML   = '';
-            
+
             for (i = 0; i <= MAX_COLUMNS; i++) {
                 finalHTML += '                ';
                 
                 if (i % 5) {
                     // Minor tick mark
-                    finalHTML += '<td class="minor-tick-mark" id="';
+                    finalHTML += '<td class="minor-tick-mark" id="tick-';
                     finalHTML += i;
                     finalHTML += '">&nbsp;</td>';
                 } else {
                     // Major tick mark
-                    finalHTML += '<td class="major-tick-mark" id="';
+                    finalHTML += '<td class="major-tick-mark" id="tick-';
                     finalHTML += i;
                     finalHTML += '">&nbsp;</td>';
                 }
@@ -102,15 +102,19 @@ define(function (require, exports, module) {
         var fullEditor  = null,
             codeMirror  = null,
             $ruler      = $("#brackets-ruler #ruler"),
-            gutterWidth = "";
+            gutterWidth = 0,
+            dummyWidth  = 0,
+            rulerOffset = 0;
         
         // Line up the zero tick mark with the editor gutter
         fullEditor = EditorManager.getCurrentFullEditor();
         codeMirror = fullEditor ? fullEditor._codeMirror : null;
         
         if (codeMirror) {
-            gutterWidth = $(codeMirror.getGutterElement()).css("width");
-            $ruler.css("left", gutterWidth);
+            gutterWidth = $(codeMirror.getGutterElement()).width();
+            dummyWidth  = $("#brackets-ruler #dummy-tick-mark").width() * 1.5;
+            rulerOffset = gutterWidth - dummyWidth + 2;
+            $ruler.css("left", rulerOffset + "px");
         } else {
             $ruler.css("left", "0px");
         }
@@ -144,8 +148,8 @@ define(function (require, exports, module) {
     
     // --- Event handlers ---
     function _updateRuler() {
-        _updateZeroTickMark();
         _updateTickMarkSpacing();
+        _updateZeroTickMark();
     }
     
     function _toggleRuler() {

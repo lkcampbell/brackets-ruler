@@ -23,7 +23,7 @@
 
 /* Ruler styles */
 #brackets-ruler .numbers {
-    font-weight: bold;
+/*    font-weight: bold;*/
     color: #fff;
 }
 
@@ -52,4 +52,8 @@
 
 #brackets-ruler .minor-tick-mark:before {
     background-color: #8E9A9D;
+}
+
+#brackets-ruler #dummy-tick-mark:before {
+    display: none;
 }
