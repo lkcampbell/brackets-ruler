@@ -42,7 +42,8 @@ define(function (require, exports, module) {
     var COMMAND_NAME    = "Toggle Ruler",
         COMMAND_ID      = "lkcampbell.toggle-ruler",
         SHORTCUT_KEY    = "Ctrl-Alt-R",
-        MAX_COLUMNS     = 240;
+        MAX_COLUMNS     = 240,
+        MAX_NUMBER_SIZE = "12px";
     
     // --- Private variables ---
     var _defPrefs       = { enabled: false },
@@ -122,10 +123,17 @@ define(function (require, exports, module) {
     }
     
     function _updateTickMarkSpacing() {
-        var fontSize    = $(".CodeMirror").css("font-size"),
-            $tickMarks  = $("#brackets-ruler .tick-marks");
+        var fontSize        = $(".CodeMirror").css("font-size"),
+            $tickMarks      = $("#brackets-ruler .tick-marks"),
+            $rulerNumbers   = $("#brackets-ruler .numbers");
         
         $tickMarks.css("font-size", fontSize);
+        
+        if (parseInt(fontSize, 10) < parseInt(MAX_NUMBER_SIZE, 10)) {
+            $rulerNumbers.css("font-size", fontSize);
+        } else {
+            $rulerNumbers.css("font-size", MAX_NUMBER_SIZE);
+        }
     }
     
     function _createRuler() {

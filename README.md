@@ -20,7 +20,6 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 ### Roadmap
 
 * Column Ruler
-  * At font size less than 12, ruler numbers need to decrease font size as well
   * Line up zero tick mark with editor gutter
   * Research: At runtime, what values are needed for calculation?
   * Run Dev Tools to see exact values using small, normal, and large font sizes
