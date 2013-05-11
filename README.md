@@ -20,8 +20,6 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 ### Roadmap
 
 * Column Ruler
-  * Event listener for adjust font size event to update ruler
-     * Brackets doesn't have this event; find a way to do this in CodeMirror
   * At font size less than 12, ruler numbers need to decrease font size as well
   * Line up zero tick mark with editor gutter
   * Research: At runtime, what values are needed for calculation?
@@ -46,8 +44,6 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
    * Clean up ruler HTML-generator code using jQuery
    * Changed CSS to LESS (proper namespacing of styles)
    * Make sure ruler plays nicely with Themes extension
-   * When adjust font size event pull request accepted, update code to use it
-      * Create pull request in Brackets for firing adjust font size event
 
 ### License
 MIT-licensed -- see `main.js` for details.

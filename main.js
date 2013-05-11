@@ -35,6 +35,7 @@ define(function (require, exports, module) {
         CommandManager      = brackets.getModule("command/CommandManager"),
         AppInit             = brackets.getModule("utils/AppInit"),
         DocumentManager     = brackets.getModule("document/DocumentManager"),
+        ViewCommandHandlers = brackets.getModule("view/ViewCommandHandlers"),
         ExtensionUtils      = brackets.getModule("utils/ExtensionUtils");
     
     // --- Constants ---
@@ -146,7 +147,7 @@ define(function (require, exports, module) {
         }
     }
     
-    // --- Event handlers ---
+    // --- Events ---
     function _updateRuler() {
         _updateTickMarkSpacing();
         _updateZeroTickMark();
@@ -166,6 +167,21 @@ define(function (require, exports, module) {
         }
     }
     
+    function _addEventListeners() {
+        var fullEditor  = null,
+            codeMirror  = null;
+        
+        $(DocumentManager).on("currentDocumentChange", _updateRuler);
+        
+        // No Font Size Adjustment Event in Brackets, use CodeMirror update Event
+        fullEditor = EditorManager.getCurrentFullEditor();
+        codeMirror = fullEditor ? fullEditor._codeMirror : null;
+        
+        if (codeMirror) {
+            codeMirror.on("update", _updateRuler);
+        }
+    }
+    
     // --- Initialize Extension ---
     AppInit.appReady(function () {
         var rulerEnabled = _prefs.getValue("enabled");
@@ -181,8 +197,9 @@ define(function (require, exports, module) {
         // Apply user preferences
         CommandManager.get(COMMAND_ID).setChecked(rulerEnabled);
         
-        // Add event listeners for updating the ruler
+        // Add Event Listeners
         $(DocumentManager).on("currentDocumentChange", _updateRuler);
+        $(ViewCommandHandlers).on("adjustFontSize", _updateRuler);
         
         // Load the ruler CSS -- when done, create the ruler
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
