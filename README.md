@@ -21,8 +21,8 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
 * Column Ruler
   * Line up zero tick mark with editor gutter
-  * Research: At runtime, what values are needed for calculation?
-  * Run Dev Tools to see exact values using small, normal, and large font sizes
+     * Research: At runtime, what values are needed for calculation?
+     * Run Dev Tools to see exact values using small, normal, and large font sizes
   * Hook in create and update ruler event for increase/decrease document width
      * Research: How to get longest line or widest visible column
      * Research: What happens to these values during word wrap?
@@ -33,9 +33,9 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
 * Column guide
    * Create UI
-   * Hook in Click event to toggle guide
+      * Hook in Click event to toggle guide
       * Hook in Drag event to move guide left and right
-      * Create UI for word wrap guide
+   * Create UI for word wrap guide
       * Hook in Click and Double Click event to toggle word wrap guide
       * Hook word wrap guide to current Brackets word wrap code
   
