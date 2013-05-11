@@ -21,8 +21,10 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
 * Column Ruler
   * Line up zero tick mark with editor gutter
-     * Research: At runtime, what values are needed for calculation?
-     * Run Dev Tools to see exact values using small, normal, and large font sizes
+     * Research: Need to get the value from the correct CodeMirror, not just the
+     first opened editor
+     * Need to figure out how to subtract tick-filler and 0.5 of zero-tick from
+     ruler offset
   * Hook in create and update ruler event for increase/decrease document width
      * Research: How to get longest line or widest visible column
      * Research: What happens to these values during word wrap?

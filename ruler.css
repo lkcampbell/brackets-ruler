@@ -54,6 +54,6 @@
     background-color: #8E9A9D;
 }
 
-#brackets-ruler #dummy-tick-mark:before {
+#brackets-ruler #tick-mark-left-filler:before {
     display: none;
 }

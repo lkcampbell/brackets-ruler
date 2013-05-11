@@ -101,21 +101,17 @@ define(function (require, exports, module) {
       
     // --- Private functions ---
     function _updateZeroTickMark() {
-        var fullEditor  = null,
-            codeMirror  = null,
-            $ruler      = $("#brackets-ruler #ruler"),
-            gutterWidth = 0,
-            dummyWidth  = 0,
-            rulerOffset = 0;
+        var editor              = EditorManager.getCurrentFullEditor(),
+            cm                  = editor ? editor._codeMirror : null,
+            $ruler              = $("#brackets-ruler #ruler"),
+            sizerMarginWidth    = 0,
+            linePaddingWidth    = 0,
+            rulerOffset         = 0;
         
-        // Line up the zero tick mark with the editor gutter
-        fullEditor = EditorManager.getCurrentFullEditor();
-        codeMirror = fullEditor ? fullEditor._codeMirror : null;
-        
-        if (codeMirror) {
-            gutterWidth = $(codeMirror.getGutterElement()).width();
-            dummyWidth  = $("#brackets-ruler #dummy-tick-mark").width() * 1.5;
-            rulerOffset = gutterWidth - dummyWidth + 2;
+        if (cm) {
+            sizerMarginWidth     = parseInt($(".CodeMirror-sizer").css("margin-left"), 10);
+            linePaddingWidth    = parseInt($(".CodeMirror pre").css("padding-left"), 10);
+            rulerOffset         = sizerMarginWidth + linePaddingWidth;
             $ruler.css("left", rulerOffset + "px");
         } else {
             $ruler.css("left", "0px");
