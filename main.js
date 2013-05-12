@@ -100,6 +100,20 @@ define(function (require, exports, module) {
     };
       
     // --- Private functions ---
+    function _updateTickMarkSpacing() {
+        var fontSize        = $(".CodeMirror").css("font-size"),
+            $tickMarks      = $("#brackets-ruler .tick-marks"),
+            $rulerNumbers   = $("#brackets-ruler .numbers");
+        
+        $tickMarks.css("font-size", fontSize);
+        
+        if (parseInt(fontSize, 10) < parseInt(MAX_NUMBER_SIZE, 10)) {
+            $rulerNumbers.css("font-size", fontSize);
+        } else {
+            $rulerNumbers.css("font-size", MAX_NUMBER_SIZE);
+        }
+    }
+    
     function _updateZeroTickMark() {
         var editor              = EditorManager.getCurrentFullEditor(),
             cm                  = editor ? editor._codeMirror : null,
@@ -120,20 +134,6 @@ define(function (require, exports, module) {
             $ruler.css("left", rulerOffset + "px");
         } else {
             $ruler.css("left", "0px");
-        }
-    }
-    
-    function _updateTickMarkSpacing() {
-        var fontSize        = $(".CodeMirror").css("font-size"),
-            $tickMarks      = $("#brackets-ruler .tick-marks"),
-            $rulerNumbers   = $("#brackets-ruler .numbers");
-        
-        $tickMarks.css("font-size", fontSize);
-        
-        if (parseInt(fontSize, 10) < parseInt(MAX_NUMBER_SIZE, 10)) {
-            $rulerNumbers.css("font-size", fontSize);
-        } else {
-            $rulerNumbers.css("font-size", MAX_NUMBER_SIZE);
         }
     }
     
@@ -175,21 +175,6 @@ define(function (require, exports, module) {
             _showRuler();
         } else {
             _hideRuler();
-        }
-    }
-    
-    function _addEventListeners() {
-        var fullEditor  = null,
-            codeMirror  = null;
-        
-        $(DocumentManager).on("currentDocumentChange", _updateRuler);
-        
-        // No Font Size Adjustment Event in Brackets, use CodeMirror update Event
-        fullEditor = EditorManager.getCurrentFullEditor();
-        codeMirror = fullEditor ? fullEditor._codeMirror : null;
-        
-        if (codeMirror) {
-            codeMirror.on("update", _updateRuler);
         }
     }
     
