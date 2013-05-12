@@ -17,6 +17,16 @@ into Extension URL field.
 Toggle the extension with **Brackets > View > Toggle Ruler** or use the
 shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
+### Known Issues
+
+**CodeMirror Themes:** Officially, I'm only making sure the column ruler
+works with the Default theme for Brackets. Unofficially, the ruler works
+correctly with most of the other CodeMirror themes as well. The problem
+cases are themes with different fonts (e.g. Rubyblue) and themes with
+drastically styled gutters (e.g. Solarized). If you find a bug with
+the ruler please make sure you can reproduce the bug while using the
+Default theme before you open an issue on it.
+
 ### Roadmap
 
 * Column Ruler
