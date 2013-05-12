@@ -23,8 +23,6 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
   * Line up zero tick mark with editor gutter
      * Research: Need to get the value from the correct CodeMirror, not just the
      first opened editor
-     * Need to figure out how to subtract tick-filler and 0.5 of zero-tick from
-     ruler offset
   * Hook in create and update ruler event for increase/decrease document width
      * Research: How to get longest line or widest visible column
      * Research: What happens to these values during word wrap?
@@ -44,7 +42,6 @@ shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 * Nice But Not Necessary
    * Clean up ruler HTML-generator code using jQuery
    * Changed CSS to LESS (proper namespacing of styles)
-   * Make sure ruler plays nicely with Themes extension
 
 ### License
 MIT-licensed -- see `main.js` for details.

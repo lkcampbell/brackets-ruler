@@ -106,12 +106,21 @@ define(function (require, exports, module) {
             $ruler              = $("#brackets-ruler #ruler"),
             sizerMarginWidth    = 0,
             linePaddingWidth    = 0,
+            tickFillerWidth     = 0,
             rulerOffset         = 0;
         
         if (cm) {
-            sizerMarginWidth     = parseInt($(".CodeMirror-sizer").css("margin-left"), 10);
+            sizerMarginWidth    = parseInt($(".CodeMirror-sizer").css("margin-left"), 10);
             linePaddingWidth    = parseInt($(".CodeMirror pre").css("padding-left"), 10);
+            tickFillerWidth     = $("#brackets-ruler #tick-mark-left-filler").width();
             rulerOffset         = sizerMarginWidth + linePaddingWidth;
+            
+            if (tickFillerWidth % 2) {
+                rulerOffset -= Math.ceil(tickFillerWidth * 1.5);
+            } else {
+                rulerOffset -= (tickFillerWidth * 1.5);
+            }
+            
             $ruler.css("left", rulerOffset + "px");
         } else {
             $ruler.css("left", "0px");
