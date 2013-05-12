@@ -103,14 +103,16 @@ define(function (require, exports, module) {
     function _updateZeroTickMark() {
         var editor              = EditorManager.getCurrentFullEditor(),
             cm                  = editor ? editor._codeMirror : null,
-            $ruler              = $("#brackets-ruler #ruler"),
+            $cmSizer            = null,
             sizerMarginWidth    = 0,
             linePaddingWidth    = 0,
             tickFillerWidth     = 0,
-            rulerOffset         = 0;
+            rulerOffset         = 0,
+            $ruler              = $("#brackets-ruler #ruler");
         
         if (cm) {
-            sizerMarginWidth    = parseInt($(".CodeMirror-sizer").css("margin-left"), 10);
+            $cmSizer            = $(cm.getScrollerElement()).find(".CodeMirror-sizer");
+            sizerMarginWidth    = parseInt($cmSizer.css("margin-left"), 10);
             linePaddingWidth    = parseInt($(".CodeMirror pre").css("padding-left"), 10);
             tickFillerWidth     = $("#brackets-ruler #tick-mark-left-filler").width();
             rulerOffset         = sizerMarginWidth + linePaddingWidth;
@@ -135,29 +137,31 @@ define(function (require, exports, module) {
         }
     }
     
+    function _updateRuler() {
+        _updateTickMarkSpacing();
+        _updateZeroTickMark();
+    }
+    
     function _createRuler() {
         $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
         $("#editor-holder").before($rulerPanel);
+        _updateRuler();
     }
     
     function _showRuler() {
         if ($rulerPanel.is(":hidden")) {
             $rulerPanel.show();
+            _updateRuler();
             EditorManager.resizeEditor();
         }
     }
     
     function _hideRuler() {
         if ($rulerPanel.is(":visible")) {
+            _updateRuler();
             $rulerPanel.hide();
             EditorManager.resizeEditor();
         }
-    }
-    
-    // --- Events ---
-    function _updateRuler() {
-        _updateTickMarkSpacing();
-        _updateZeroTickMark();
     }
     
     function _toggleRuler() {
@@ -212,7 +216,6 @@ define(function (require, exports, module) {
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
                 _createRuler();
-                _updateRuler();
                 
                 if (rulerEnabled) {
                     _showRuler();

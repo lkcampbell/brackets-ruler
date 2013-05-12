@@ -30,16 +30,13 @@ Default theme before you open an issue on it.
 ### Roadmap
 
 * Column Ruler
-  * Line up zero tick mark with editor gutter
-     * Research: Need to get the value from the correct CodeMirror, not just the
-     first opened editor
+  * Sync up editor scrolling and ruler scrolling
   * Hook in create and update ruler event for increase/decrease document width
      * Research: How to get longest line or widest visible column
      * Research: What happens to these values during word wrap?
      * Have a minimum width that runs off of the editor screen always
      * Using jQuery, add or remove one `<td>` for each character change
   * Conditional code for updating ruler: gutter size, font size, document width
-  * Sync up editor scrolling and ruler scrolling
 
 * Column guide
    * Create UI
