@@ -114,7 +114,7 @@ define(function (require, exports, module) {
         }
     }
     
-    function _updateZeroTickMark() {
+    function _adjustZeroTickMark(adjustment) {
         var editor              = EditorManager.getCurrentFullEditor(),
             cm                  = editor ? editor._codeMirror : null,
             $cmSizer            = null,
@@ -131,6 +131,7 @@ define(function (require, exports, module) {
             tickFillerWidth     = $("#brackets-ruler #tick-mark-left-filler").width();
             rulerOffset         = sizerMarginWidth + linePaddingWidth;
             rulerOffset         -= Math.ceil(tickFillerWidth * 1.5);
+            rulerOffset         += adjustment;
             $ruler.css("left", rulerOffset + "px");
         } else {
             $ruler.css("left", "0px");
@@ -139,7 +140,7 @@ define(function (require, exports, module) {
     
     function _updateRuler() {
         _updateTickMarkSpacing();
-        _updateZeroTickMark();
+        _adjustZeroTickMark(0);
     }
     
     function _createRuler() {
@@ -180,7 +181,9 @@ define(function (require, exports, module) {
     
     // --- Initialize Extension ---
     AppInit.appReady(function () {
-        var rulerEnabled = _prefs.getValue("enabled");
+        var rulerEnabled    = _prefs.getValue("enabled"),
+            editor          = EditorManager.getCurrentFullEditor(),
+            cm              = editor ? editor._codeMirror : null;
         
         // Register command
         CommandManager.register(COMMAND_NAME, COMMAND_ID, _toggleRuler);
@@ -196,6 +199,14 @@ define(function (require, exports, module) {
         // Add Event Listeners
         $(DocumentManager).on("currentDocumentChange", _updateRuler);
         $(ViewCommandHandlers).on("adjustFontSize", _updateRuler);
+        
+        // I can't get the Editor scroll event to work so I am hooking into
+        // the CodeMirror scroll event for now.
+        if (cm) {
+            cm.on("scroll", function (cm) {
+                _adjustZeroTickMark(-(cm.getScrollInfo().left));
+            });
+        }
         
         // Load the ruler CSS -- when done, create the ruler
         ExtensionUtils.loadStyleSheet(module, "ruler.css")

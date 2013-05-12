@@ -30,7 +30,6 @@ Default theme before you open an issue on it.
 ### Roadmap
 
 * Column Ruler
-  * Sync up editor scrolling and ruler scrolling
   * Hook in create and update ruler event for increase/decrease document width
      * Research: How to get longest line or widest visible column
      * Research: What happens to these values during word wrap?
@@ -49,6 +48,7 @@ Default theme before you open an issue on it.
 * Nice But Not Necessary
    * Clean up ruler HTML-generator code using jQuery
    * Changed CSS to LESS (proper namespacing of styles)
+   * Update ruler when changing themes in Themes extension
 
 ### License
 MIT-licensed -- see `main.js` for details.
