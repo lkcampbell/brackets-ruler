@@ -75,7 +75,7 @@ define(function (require, exports, module) {
         "rulerTickMark": function () {
             var i           = 0,
                 finalHTML   = '';
-
+            
             for (i = 0; i <= MAX_COLUMNS; i++) {
                 finalHTML += '                ';
                 
@@ -114,13 +114,7 @@ define(function (require, exports, module) {
             linePaddingWidth    = parseInt($(".CodeMirror pre").css("padding-left"), 10);
             tickFillerWidth     = $("#brackets-ruler #tick-mark-left-filler").width();
             rulerOffset         = sizerMarginWidth + linePaddingWidth;
-            
-            if (tickFillerWidth % 2) {
-                rulerOffset -= Math.ceil(tickFillerWidth * 1.5);
-            } else {
-                rulerOffset -= (tickFillerWidth * 1.5);
-            }
-            
+            rulerOffset         -= Math.ceil(tickFillerWidth * 1.5);
             $ruler.css("left", rulerOffset + "px");
         } else {
             $ruler.css("left", "0px");
