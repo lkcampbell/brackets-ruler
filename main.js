@@ -42,7 +42,7 @@ define(function (require, exports, module) {
     var COMMAND_NAME    = "Toggle Ruler",
         COMMAND_ID      = "lkcampbell.toggle-ruler",
         SHORTCUT_KEY    = "Ctrl-Alt-R",
-        MAX_COLUMNS     = 240,
+        INIT_COLUMNS    = 80,
         MAX_NUMBER_SIZE = "12px";
     
     // --- Private variables ---
@@ -50,20 +50,21 @@ define(function (require, exports, module) {
         _prefs          = PreferencesManager.getPreferenceStorage(module, _defPrefs),
         _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
         _rulerHTML      = require("text!ruler-template.html"),
-        $rulerPanel     = null;
+        $rulerPanel     = null,
+        rulerLength     = 0;
     
     var _templateFunctions = {
         "rulerNumber": function () {
             var i           = 0,
                 finalHTML   = '';
             
-            for (i = 10; i <= MAX_COLUMNS; i += 10) {
+            for (i = 10; i <= INIT_COLUMNS; i += 10) {
                 finalHTML += '                ';
                 finalHTML += '<td class="number" colspan="9">';
                 finalHTML += i;
                 finalHTML += '</td>';
                 
-                if (i !== MAX_COLUMNS) {
+                if (i !== INIT_COLUMNS) {
                     finalHTML += '\n';
                     finalHTML += '                ';
                     finalHTML += '<td class="number"></td>';
@@ -76,7 +77,7 @@ define(function (require, exports, module) {
             var i           = 0,
                 finalHTML   = '';
             
-            for (i = 0; i <= MAX_COLUMNS; i++) {
+            for (i = 0; i <= INIT_COLUMNS; i++) {
                 finalHTML += '                ';
                 
                 if (i % 5) {
@@ -91,7 +92,7 @@ define(function (require, exports, module) {
                     finalHTML += '">&nbsp;</td>';
                 }
                 
-                if (i !== MAX_COLUMNS) {
+                if (i !== INIT_COLUMNS) {
                     finalHTML += '\n';
                 }
             }
@@ -100,7 +101,7 @@ define(function (require, exports, module) {
     };
       
     // --- Private functions ---
-    function _updateTickMarkSpacing() {
+    function _updateTickMarks() {
         var fontSize        = $(".CodeMirror").css("font-size"),
             $tickMarks      = $("#brackets-ruler .tick-marks"),
             $rulerNumbers   = $("#brackets-ruler .numbers");
@@ -111,6 +112,15 @@ define(function (require, exports, module) {
             $rulerNumbers.css("font-size", fontSize);
         } else {
             $rulerNumbers.css("font-size", MAX_NUMBER_SIZE);
+        }
+    }
+    
+    function _updateRulerLength() {
+        var editor      = EditorManager.getCurrentFullEditor(),
+            cm          = editor ? editor._codeMirror : null;
+        
+        if (cm) {
+            console.log("*** Update Ruler Length Here ***");
         }
     }
     
@@ -144,7 +154,8 @@ define(function (require, exports, module) {
     }
     
     function _updateRuler() {
-        _updateTickMarkSpacing();
+        _updateTickMarks();
+        _updateRulerLength();
         _updateRulerScroll();
     }
     
@@ -200,7 +211,7 @@ define(function (require, exports, module) {
         
         // Add Event Listeners
         $(DocumentManager).on("currentDocumentChange", _updateRuler);
-        $(ViewCommandHandlers).on("adjustFontSize", _updateRuler);
+        $(ViewCommandHandlers).on("fontSizeChange", _updateRuler);
         
         // Load the ruler CSS -- when done, create the ruler
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
