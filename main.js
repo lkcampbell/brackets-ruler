@@ -144,20 +144,17 @@ define(function (require, exports, module) {
     }
     
     function _updateRuler() {
-        console.log("_updateRuler() called");
         _updateTickMarkSpacing();
         _updateRulerScroll();
     }
     
     function _createRuler() {
-        console.log("_createRuler() called");
         $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
         $("#editor-holder").before($rulerPanel);
         EditorManager.resizeEditor();
     }
     
     function _showRuler() {
-        console.log("_showRuler() called");
         if ($rulerPanel.is(":hidden")) {
             $rulerPanel.show();
             EditorManager.resizeEditor();
@@ -166,7 +163,6 @@ define(function (require, exports, module) {
     }
     
     function _hideRuler() {
-        console.log("_hideRuler() called");
         if ($rulerPanel.is(":visible")) {
             $rulerPanel.hide();
             EditorManager.resizeEditor();
