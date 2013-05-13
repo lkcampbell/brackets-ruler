@@ -13,7 +13,7 @@
 /* Ruler styles */
 #brackets-ruler {
     background-color: #3C3F41;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 #brackets-ruler table {

@@ -114,7 +114,7 @@ define(function (require, exports, module) {
         }
     }
     
-    function _adjustZeroTickMark(adjustment) {
+    function _updateRulerScroll() {
         var editor              = EditorManager.getCurrentFullEditor(),
             cm                  = editor ? editor._codeMirror : null,
             $cmSizer            = null,
@@ -125,13 +125,18 @@ define(function (require, exports, module) {
             $ruler              = $("#brackets-ruler #ruler");
         
         if (cm) {
+            // Make sure this CodeMirror editor gets only one scroll listener
+            cm.off("scroll", _updateRulerScroll);
+            cm.on("scroll", _updateRulerScroll);
+            
+            // Scroll the ruler to the proper horizontal position
             $cmSizer            = $(cm.getScrollerElement()).find(".CodeMirror-sizer");
             sizerMarginWidth    = parseInt($cmSizer.css("margin-left"), 10);
             linePaddingWidth    = parseInt($(".CodeMirror pre").css("padding-left"), 10);
             tickFillerWidth     = $("#brackets-ruler #tick-mark-left-filler").width();
             rulerOffset         = sizerMarginWidth + linePaddingWidth;
             rulerOffset         -= Math.ceil(tickFillerWidth * 1.5);
-            rulerOffset         += adjustment;
+            rulerOffset         -= cm.getScrollInfo().left;
             $ruler.css("left", rulerOffset + "px");
         } else {
             $ruler.css("left", "0px");
@@ -139,27 +144,30 @@ define(function (require, exports, module) {
     }
     
     function _updateRuler() {
+        console.log("_updateRuler() called");
         _updateTickMarkSpacing();
-        _adjustZeroTickMark(0);
+        _updateRulerScroll();
     }
     
     function _createRuler() {
+        console.log("_createRuler() called");
         $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
         $("#editor-holder").before($rulerPanel);
-        _updateRuler();
+        EditorManager.resizeEditor();
     }
     
     function _showRuler() {
+        console.log("_showRuler() called");
         if ($rulerPanel.is(":hidden")) {
             $rulerPanel.show();
-            _updateRuler();
             EditorManager.resizeEditor();
         }
+        _updateRuler();
     }
     
     function _hideRuler() {
+        console.log("_hideRuler() called");
         if ($rulerPanel.is(":visible")) {
-            _updateRuler();
             $rulerPanel.hide();
             EditorManager.resizeEditor();
         }
@@ -181,9 +189,7 @@ define(function (require, exports, module) {
     
     // --- Initialize Extension ---
     AppInit.appReady(function () {
-        var rulerEnabled    = _prefs.getValue("enabled"),
-            editor          = EditorManager.getCurrentFullEditor(),
-            cm              = editor ? editor._codeMirror : null;
+        var rulerEnabled = _prefs.getValue("enabled");
         
         // Register command
         CommandManager.register(COMMAND_NAME, COMMAND_ID, _toggleRuler);
@@ -199,14 +205,6 @@ define(function (require, exports, module) {
         // Add Event Listeners
         $(DocumentManager).on("currentDocumentChange", _updateRuler);
         $(ViewCommandHandlers).on("adjustFontSize", _updateRuler);
-        
-        // I can't get the Editor scroll event to work so I am hooking into
-        // the CodeMirror scroll event for now.
-        if (cm) {
-            cm.on("scroll", function (cm) {
-                _adjustZeroTickMark(-(cm.getScrollInfo().left));
-            });
-        }
         
         // Load the ruler CSS -- when done, create the ruler
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
