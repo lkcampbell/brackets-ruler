@@ -41,9 +41,10 @@ define(function (require, exports, module) {
     // --- Constants ---
     var COMMAND_NAME    = "Toggle Ruler",
         COMMAND_ID      = "lkcampbell.toggle-ruler",
-        SHORTCUT_KEY    = "Ctrl-Alt-R",
-        INIT_COLUMNS    = 80,
-        MAX_NUMBER_SIZE = "12px";
+        SHORTCUT_KEY    = "Ctrl-Alt-R";
+    
+    var INIT_COLUMNS    = 80,   // Must be multiple of ten
+        MAX_NUMBER_SIZE = 12;   // Measured in pixel units
     
     // --- Private variables ---
     var _defPrefs       = { enabled: false },
@@ -60,7 +61,9 @@ define(function (require, exports, module) {
             
             for (i = 10; i <= INIT_COLUMNS; i += 10) {
                 finalHTML += '                ';
-                finalHTML += '<td class="number" colspan="9">';
+                finalHTML += '<td class="number" colspan="';
+                finalHTML += (i === INIT_COLUMNS) ? '6' : '9';
+                finalHTML += '">';
                 finalHTML += i;
                 finalHTML += '</td>';
                 
@@ -108,10 +111,10 @@ define(function (require, exports, module) {
         
         $tickMarks.css("font-size", fontSize);
         
-        if (parseInt(fontSize, 10) < parseInt(MAX_NUMBER_SIZE, 10)) {
+        if (parseInt(fontSize, 10) < MAX_NUMBER_SIZE) {
             $rulerNumbers.css("font-size", fontSize);
         } else {
-            $rulerNumbers.css("font-size", MAX_NUMBER_SIZE);
+            $rulerNumbers.css("font-size", MAX_NUMBER_SIZE + "px");
         }
     }
     
@@ -120,7 +123,7 @@ define(function (require, exports, module) {
             cm          = editor ? editor._codeMirror : null;
         
         if (cm) {
-            console.log("*** Update Ruler Length Here ***");
+            console.log("cm.display.maxLineLength = %s", cm.display.maxLineLength);
         }
     }
     

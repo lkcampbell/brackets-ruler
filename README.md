@@ -31,10 +31,10 @@ Default theme before you open an issue on it.
 
 * Column Ruler
   * Hook in create and update ruler event for increase/decrease document width
-     * Research: How to get longest line or widest visible column
-     * Research: What happens to these values during word wrap?
-     * Have a minimum width that runs off of the editor screen always
+     * Length is equal to the next ten-unit tick mark beyond the longest line
+     * Should fire off after each text change
      * Using jQuery, add or remove one `<td>` for each character change
+  * Change CodeMirror scroll event to Editor scroll event
   * Conditional code for updating ruler: gutter size, font size, document width
 
 * Column guide
