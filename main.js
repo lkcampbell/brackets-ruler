@@ -47,12 +47,11 @@ define(function (require, exports, module) {
         MAX_NUMBER_SIZE = 12;   // Measured in pixel units
     
     // --- Private variables ---
-    var _defPrefs       = { enabled: false },
-        _prefs          = PreferencesManager.getPreferenceStorage(module, _defPrefs),
-        _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
-        _rulerHTML      = require("text!ruler-template.html"),
-        $rulerPanel     = null,
-        rulerLength     = 0;
+    var _defPrefs   = { enabled: false },
+        _prefs      = PreferencesManager.getPreferenceStorage(module, _defPrefs),
+        _viewMenu   = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
+        _rulerHTML  = require("text!ruler-template.html"),
+        $rulerPanel = null;
     
     var _templateFunctions = {
         "rulerNumber": function () {
@@ -104,10 +103,40 @@ define(function (require, exports, module) {
     };
       
     // --- Private functions ---
+    function _updateRulerScroll() {
+        var editor              = EditorManager.getCurrentFullEditor(),
+            cm                  = editor ? editor._codeMirror : null,
+            rulerHidden         = false,
+            $cmSizer            = null,
+            sizerMarginWidth    = 0,
+            linePaddingWidth    = 0,
+            tickWidth           = 0,
+            rulerOffset         = 0,
+            $ruler              = $("#brackets-ruler #ruler");
+        
+        if ($rulerPanel.is(":hidden")) { return; }
+        
+        if (cm) {
+            // Scroll the ruler to the proper horizontal position
+            $cmSizer            = $(cm.getScrollerElement()).find(".CodeMirror-sizer");
+            sizerMarginWidth    = parseInt($cmSizer.css("margin-left"), 10);
+            linePaddingWidth    = parseInt($(".CodeMirror pre").css("padding-left"), 10);
+            tickWidth           = $("#brackets-ruler #tick-mark-left-filler").width();
+            rulerOffset         = sizerMarginWidth + linePaddingWidth;
+            rulerOffset         -= Math.ceil(tickWidth * 1.5);
+            rulerOffset         -= cm.getScrollInfo().left;
+            $ruler.css("left", rulerOffset + "px");
+        } else {
+            $ruler.css("left", "0px");
+        }
+    }
+    
     function _updateTickMarks() {
         var fontSize        = $(".CodeMirror").css("font-size"),
             $tickMarks      = $("#brackets-ruler .tick-marks"),
             $rulerNumbers   = $("#brackets-ruler .numbers");
+        
+        if ($rulerPanel.is(":hidden")) { return; }
         
         $tickMarks.css("font-size", fontSize);
         
@@ -116,71 +145,35 @@ define(function (require, exports, module) {
         } else {
             $rulerNumbers.css("font-size", MAX_NUMBER_SIZE + "px");
         }
+        
+        _updateRulerScroll();
     }
     
     function _updateRulerLength() {
-        var editor      = EditorManager.getCurrentFullEditor(),
-            cm          = editor ? editor._codeMirror : null;
+        var editor  = EditorManager.getCurrentFullEditor(),
+            cm      = editor ? editor._codeMirror : null;
+        
+        if ($rulerPanel.is(":hidden")) { return; }
         
         if (cm) {
             console.log("cm.display.maxLineLength = %s", cm.display.maxLineLength);
         }
     }
     
-    function _updateRulerScroll() {
-        var editor              = EditorManager.getCurrentFullEditor(),
-            cm                  = editor ? editor._codeMirror : null,
-            $cmSizer            = null,
-            sizerMarginWidth    = 0,
-            linePaddingWidth    = 0,
-            tickFillerWidth     = 0,
-            rulerOffset         = 0,
-            $ruler              = $("#brackets-ruler #ruler");
-        
-        if (cm) {
-            // Make sure this CodeMirror editor gets only one scroll listener
-            cm.off("scroll", _updateRulerScroll);
-            cm.on("scroll", _updateRulerScroll);
-            
-            // Scroll the ruler to the proper horizontal position
-            $cmSizer            = $(cm.getScrollerElement()).find(".CodeMirror-sizer");
-            sizerMarginWidth    = parseInt($cmSizer.css("margin-left"), 10);
-            linePaddingWidth    = parseInt($(".CodeMirror pre").css("padding-left"), 10);
-            tickFillerWidth     = $("#brackets-ruler #tick-mark-left-filler").width();
-            rulerOffset         = sizerMarginWidth + linePaddingWidth;
-            rulerOffset         -= Math.ceil(tickFillerWidth * 1.5);
-            rulerOffset         -= cm.getScrollInfo().left;
-            $ruler.css("left", rulerOffset + "px");
-        } else {
-            $ruler.css("left", "0px");
-        }
-    }
-    
-    function _updateRuler() {
-        _updateTickMarks();
-        _updateRulerLength();
-        _updateRulerScroll();
-    }
-    
-    function _createRuler() {
-        $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
-        $("#editor-holder").before($rulerPanel);
-        EditorManager.resizeEditor();
-    }
-    
     function _showRuler() {
-        if ($rulerPanel.is(":hidden")) {
-            $rulerPanel.show();
-            EditorManager.resizeEditor();
-        }
-        _updateRuler();
+        $rulerPanel.show();
+        EditorManager.resizeEditor();
+        
+        // Full ruler updates must occur ONLY when the ruler is visible.
+        // jQuery doesn't return width() for hidden elements.
+        _updateTickMarks();
+        // _updateRulerScroll() is called by _updateTickMarks()
+        _updateRulerLength();
     }
     
     function _hideRuler() {
-        if ($rulerPanel.is(":visible")) {
-            $rulerPanel.hide();
-            EditorManager.resizeEditor();
-        }
+        $rulerPanel.hide();
+        EditorManager.resizeEditor();
     }
     
     function _toggleRuler() {
@@ -194,6 +187,24 @@ define(function (require, exports, module) {
             _showRuler();
         } else {
             _hideRuler();
+        }
+    }
+    
+    function _handleDocumentChange() {
+        _updateRulerLength();
+        
+        // Need to add Document listeners with appropriate reference code
+    }
+    
+    function _handleEditorChange(event, newEditor, oldEditor) {
+        _updateRulerScroll();
+        
+        if (newEditor) {
+            $(newEditor).on("scroll", _updateRulerScroll);
+        }
+        
+        if (oldEditor) {
+            $(oldEditor).off("scroll", _updateRulerScroll);
         }
     }
     
@@ -213,13 +224,16 @@ define(function (require, exports, module) {
         CommandManager.get(COMMAND_ID).setChecked(rulerEnabled);
         
         // Add Event Listeners
-        $(DocumentManager).on("currentDocumentChange", _updateRuler);
-        $(ViewCommandHandlers).on("fontSizeChange", _updateRuler);
+        $(ViewCommandHandlers).on("fontSizeChange", _updateTickMarks);
+        $(EditorManager).on("activeEditorChange", _handleEditorChange);
+        $(DocumentManager).on("currentDocumentChange", _handleDocumentChange);
         
-        // Load the ruler CSS -- when done, create the ruler
+        // Load the ruler CSS -- when done, create the ruler then show/hide the ruler
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
-                _createRuler();
+                // Insert Ruler HTML
+                $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
+                $("#editor-holder").before($rulerPanel);
                 
                 if (rulerEnabled) {
                     _showRuler();

@@ -2,10 +2,10 @@
 An extension for [Brackets](https://github.com/adobe/brackets/) that adds
 an adjustable column ruler to the editor.
 
-**WARNING:** This extension is in experimental mode and is not functional
-at all. I am putting it on GitHub purely for my own convenience.  Please
-do **not** install it or use it until I have made an announcement on the
-Bracket-Dev Google Group that it is ready to use.
+**WARNING:** This extension is in experimental mode. I am putting it on
+GitHub purely for my own convenience.  Please do **not** install it or
+use it until I have made an announcement on the Bracket-Dev Google Group
+that it is ready to use.
 
 ### How to Install
 1. Select **Brackets > File > Install Extension...**
@@ -34,8 +34,7 @@ Default theme before you open an issue on it.
      * Length is equal to the next ten-unit tick mark beyond the longest line
      * Should fire off after each text change
      * Using jQuery, add or remove one `<td>` for each character change
-  * Change CodeMirror scroll event to Editor scroll event
-  * Conditional code for updating ruler: gutter size, font size, document width
+     * Clean up ruler HTML-generator code using jQuery
 
 * Column guide
    * Create UI
@@ -46,8 +45,7 @@ Default theme before you open an issue on it.
       * Hook word wrap guide to current Brackets word wrap code
   
 * Nice But Not Necessary
-   * Clean up ruler HTML-generator code using jQuery
-   * Changed CSS to LESS (proper namespacing of styles)
+   * Change CSS to LESS (proper namespacing of styles)
    * Update ruler when changing themes in Themes extension
 
 ### License
