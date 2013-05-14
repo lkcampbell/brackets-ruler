@@ -145,8 +145,6 @@ define(function (require, exports, module) {
         } else {
             $rulerNumbers.css("font-size", MAX_NUMBER_SIZE + "px");
         }
-        
-        _updateRulerScroll();
     }
     
     function _updateRulerLength() {
@@ -167,7 +165,7 @@ define(function (require, exports, module) {
         // Full ruler updates must occur ONLY when the ruler is visible.
         // jQuery doesn't return width() for hidden elements.
         _updateTickMarks();
-        // _updateRulerScroll() is called by _updateTickMarks()
+        _updateRulerScroll();
         _updateRulerLength();
     }
     
@@ -197,20 +195,23 @@ define(function (require, exports, module) {
     }
     
     function _handleEditorChange(event, newEditor, oldEditor) {
-        _updateRulerScroll();
-        
         if (newEditor) {
             $(newEditor).on("scroll", _updateRulerScroll);
+            newEditor.refresh();
         }
         
         if (oldEditor) {
             $(oldEditor).off("scroll", _updateRulerScroll);
         }
+        
+        _updateRulerScroll();
     }
     
     // --- Initialize Extension ---
     AppInit.appReady(function () {
-        var rulerEnabled = _prefs.getValue("enabled");
+        var rulerEnabled    = _prefs.getValue("enabled"),
+            editor          = null,
+            document        = null;
         
         // Register command
         CommandManager.register(COMMAND_NAME, COMMAND_ID, _toggleRuler);
@@ -228,12 +229,17 @@ define(function (require, exports, module) {
         $(EditorManager).on("activeEditorChange", _handleEditorChange);
         $(DocumentManager).on("currentDocumentChange", _handleDocumentChange);
         
-        // Load the ruler CSS -- when done, create the ruler then show/hide the ruler
+        // Load the ruler CSS and create the ruler
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
-                // Insert Ruler HTML
                 $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
                 $("#editor-holder").before($rulerPanel);
+                
+                editor = EditorManager.getCurrentFullEditor();
+                $(editor).on("scroll", _updateRulerScroll);
+                
+                document = DocumentManager.getCurrentDocument();
+                // Need to add Document listeners with appropriate reference code
                 
                 if (rulerEnabled) {
                     _showRuler();
