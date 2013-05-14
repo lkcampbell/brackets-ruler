@@ -47,11 +47,14 @@ define(function (require, exports, module) {
         MAX_NUMBER_SIZE = 12;   // Measured in pixel units
     
     // --- Private variables ---
-    var _defPrefs   = { enabled: false },
-        _prefs      = PreferencesManager.getPreferenceStorage(module, _defPrefs),
-        _viewMenu   = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
-        _rulerHTML  = require("text!ruler-template.html"),
-        $rulerPanel = null;
+    var _defPrefs       = { enabled: false },
+        _prefs          = PreferencesManager.getPreferenceStorage(module, _defPrefs),
+        _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
+        _rulerHTML      = require("text!ruler-template.html"),
+        _currentDoc     = null,
+        _rulerLength    = INIT_COLUMNS;
+    
+    var $rulerPanel     = null;
     
     var _templateFunctions = {
         "rulerNumber": function () {
@@ -145,6 +148,8 @@ define(function (require, exports, module) {
         } else {
             $rulerNumbers.css("font-size", MAX_NUMBER_SIZE + "px");
         }
+        
+        _updateRulerScroll();
     }
     
     function _updateRulerLength() {
@@ -189,9 +194,19 @@ define(function (require, exports, module) {
     }
     
     function _handleDocumentChange() {
-        _updateRulerLength();
+        if (_currentDoc) {
+            $(_currentDoc).off("change", _updateRulerLength);
+            _currentDoc.releaseRef();
+        }
         
-        // Need to add Document listeners with appropriate reference code
+        _currentDoc = DocumentManager.getCurrentDocument();
+        
+        if (_currentDoc) {
+            $(_currentDoc).on("change", _updateRulerLength);
+            _currentDoc.addRef();
+        }
+        
+        _updateRulerLength();
     }
     
     function _handleEditorChange(event, newEditor, oldEditor) {
@@ -210,8 +225,7 @@ define(function (require, exports, module) {
     // --- Initialize Extension ---
     AppInit.appReady(function () {
         var rulerEnabled    = _prefs.getValue("enabled"),
-            editor          = null,
-            document        = null;
+            editor          = null;
         
         // Register command
         CommandManager.register(COMMAND_NAME, COMMAND_ID, _toggleRuler);
@@ -236,10 +250,17 @@ define(function (require, exports, module) {
                 $("#editor-holder").before($rulerPanel);
                 
                 editor = EditorManager.getCurrentFullEditor();
-                $(editor).on("scroll", _updateRulerScroll);
                 
-                document = DocumentManager.getCurrentDocument();
-                // Need to add Document listeners with appropriate reference code
+                if (editor) {
+                    $(editor).on("scroll", _updateRulerScroll);
+                }
+                
+                _currentDoc = DocumentManager.getCurrentDocument();
+                
+                if (_currentDoc) {
+                    $(_currentDoc).on("change", _updateRulerLength);
+                    _currentDoc.addRef();
+                }
                 
                 if (rulerEnabled) {
                     _showRuler();
