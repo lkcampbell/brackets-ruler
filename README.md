@@ -2,10 +2,7 @@
 An extension for [Brackets](https://github.com/adobe/brackets/) that adds
 an adjustable column ruler to the editor.
 
-**WARNING:** This extension is in experimental mode. I am putting it on
-GitHub purely for my own convenience.  Please do **not** install it or
-use it until I have made an announcement on the Bracket-Dev Google Group
-that it is ready to use.
+This extension is still being built.  See the Roadmap section for more details.
 
 ### How to Install
 1. Select **Brackets > File > Install Extension...**
