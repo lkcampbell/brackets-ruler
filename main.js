@@ -43,7 +43,7 @@ define(function (require, exports, module) {
         COMMAND_ID      = "lkcampbell.toggle-ruler",
         SHORTCUT_KEY    = "Ctrl-Alt-R";
     
-    var INIT_COLUMNS    = 80,   // Must be multiple of ten
+    var MINIMUM_COLUMNS = 80,   // Must be multiple of ten
         MAX_NUMBER_SIZE = 12;   // Measured in pixel units
     
     // --- Private variables ---
@@ -52,7 +52,7 @@ define(function (require, exports, module) {
         _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
         _rulerHTML      = require("text!ruler-template.html"),
         _currentDoc     = null,
-        _rulerLength    = INIT_COLUMNS;
+        _rulerLength    = MINIMUM_COLUMNS;
     
     var $rulerPanel     = null;
     
@@ -61,15 +61,15 @@ define(function (require, exports, module) {
             var i           = 0,
                 finalHTML   = '';
             
-            for (i = 10; i <= INIT_COLUMNS; i += 10) {
+            for (i = 10; i <= MINIMUM_COLUMNS; i += 10) {
                 finalHTML += '                ';
                 finalHTML += '<td class="number" colspan="';
-                finalHTML += (i === INIT_COLUMNS) ? '6' : '9';
+                finalHTML += (i === MINIMUM_COLUMNS) ? '6' : '9';
                 finalHTML += '">';
                 finalHTML += i;
                 finalHTML += '</td>';
                 
-                if (i !== INIT_COLUMNS) {
+                if (i !== MINIMUM_COLUMNS) {
                     finalHTML += '\n';
                     finalHTML += '                ';
                     finalHTML += '<td class="number"></td>';
@@ -82,7 +82,7 @@ define(function (require, exports, module) {
             var i           = 0,
                 finalHTML   = '';
             
-            for (i = 0; i <= INIT_COLUMNS; i++) {
+            for (i = 0; i <= MINIMUM_COLUMNS; i++) {
                 finalHTML += '                ';
                 
                 if (i % 5) {
@@ -97,7 +97,7 @@ define(function (require, exports, module) {
                     finalHTML += '">&nbsp;</td>';
                 }
                 
-                if (i !== INIT_COLUMNS) {
+                if (i !== MINIMUM_COLUMNS) {
                     finalHTML += '\n';
                 }
             }
@@ -153,13 +153,87 @@ define(function (require, exports, module) {
     }
     
     function _updateRulerLength() {
-        var editor  = EditorManager.getCurrentFullEditor(),
-            cm      = editor ? editor._codeMirror : null;
+        var editor              = EditorManager.getCurrentFullEditor(),
+            cm                  = editor ? editor._codeMirror : null,
+            maxLineLength       = 0,
+            currentMaxColumns   = 0,
+            newMaxColumns       = 0,
+            $currentElement     = null,
+            $newElement         = null,
+            i                   = 0;
         
         if ($rulerPanel.is(":hidden")) { return; }
         
         if (cm) {
-            console.log("cm.display.maxLineLength = %s", cm.display.maxLineLength);
+            maxLineLength = cm.display.maxLineLength;
+            
+            if (maxLineLength <= MINIMUM_COLUMNS) { return; }
+            
+            $currentElement     = $("#number-right-filler").prev();
+            currentMaxColumns   = parseInt($currentElement.text(), 10);
+            newMaxColumns       = Math.ceil(maxLineLength / 10) * 10;
+            
+            if (newMaxColumns < currentMaxColumns) {
+                // Remove Ruler Numbers
+                console.log("Remove Ruler Numbers");
+                // Remove Ruler Tick Marks
+                console.log("Remove Tick Marks");
+            } else if (newMaxColumns > currentMaxColumns) {
+                // Add Ruler Numbers
+                $currentElement = $("#number-right-filler").prev();
+                $currentElement.attr("colspan", 9);
+                $newElement = $("<td></td>");
+                $newElement.attr("class", "number");
+                $currentElement.after($newElement);
+                $currentElement = $currentElement.next();
+                
+                for (i = (currentMaxColumns + 10); i <= newMaxColumns; i += 10) {
+                    $newElement = $("<td></td>");
+                    $newElement.attr("class", "number");
+                    
+                    if (i !== newMaxColumns) {
+                        $newElement.attr("colspan", 9);
+                    } else {
+                        $newElement.attr("colspan", 6);
+                    }
+                    
+                    $newElement.text(i);
+                    $currentElement.after($newElement);
+                    $currentElement = $currentElement.next();
+                    
+                    if (i !== newMaxColumns) {
+                        $newElement = $("<td></td>");
+                        $newElement.attr("class", "number");
+                        $currentElement = $currentElement.after($newElement);
+                        $currentElement = $currentElement.next();
+                    }
+                }
+                
+                // Add Ruler Tick Marks
+                $currentElement = $("#tick-mark-right-filler").prev();
+                
+                for (i = (currentMaxColumns + 1); i <= newMaxColumns; i++) {
+                    $newElement = $("<td></td>");
+                    
+                    if (i % 10) {
+                        // Minor Tick Mark
+                        $newElement.attr("class", "minor-tick-mark");
+                    } else {
+                        // Major Tick Mark
+                        $newElement.attr("class", "major-tick-mark");
+                    }
+                    
+                    $newElement.attr("id", "tick-" + i);
+                    
+                    // Insert non-breaking space character
+                    $newElement.text("\xa0");
+                    
+                    $currentElement.after($newElement);
+                    $currentElement = $currentElement.next();
+                }
+            } else {
+                return;
+            }
         }
     }
     
@@ -208,7 +282,7 @@ define(function (require, exports, module) {
         
         _updateRulerLength();
     }
-    
+      
     function _handleEditorChange(event, newEditor, oldEditor) {
         if (newEditor) {
             $(newEditor).on("scroll", _updateRulerScroll);
