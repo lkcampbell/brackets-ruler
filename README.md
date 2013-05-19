@@ -26,13 +26,6 @@ Default theme before you open an issue on it.
 
 ### Roadmap
 
-* Column Ruler
-  * Hook in create and update ruler event for increase/decrease document width
-     * Length is equal to the next ten-unit tick mark beyond the longest line
-     * Should fire off after each text change
-     * Using jQuery, add or remove one `<td>` for each character change
-     * Clean up ruler HTML-generator code using jQuery
-
 * Column guide
    * Create UI
       * Hook in Click event to toggle guide
@@ -44,6 +37,7 @@ Default theme before you open an issue on it.
 * Nice But Not Necessary
    * Change CSS to LESS (proper namespacing of styles)
    * Update ruler when changing themes in Themes extension
+   * Clean up ruler HTML-generator code using jQuery
 
 ### License
 MIT-licensed -- see `main.js` for details.

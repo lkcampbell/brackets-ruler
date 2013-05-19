@@ -155,8 +155,8 @@ define(function (require, exports, module) {
     function _updateRulerLength() {
         var editor              = EditorManager.getCurrentFullEditor(),
             cm                  = editor ? editor._codeMirror : null,
-            maxLineLength       = 0,
             currentMaxColumns   = 0,
+            maxLineLength       = 0,
             newMaxColumns       = 0,
             $currentElement     = null,
             $newElement         = null,
@@ -165,19 +165,35 @@ define(function (require, exports, module) {
         if ($rulerPanel.is(":hidden")) { return; }
         
         if (cm) {
-            maxLineLength = cm.display.maxLineLength;
-            
-            if (maxLineLength <= MINIMUM_COLUMNS) { return; }
-            
             $currentElement     = $("#number-right-filler").prev();
             currentMaxColumns   = parseInt($currentElement.text(), 10);
-            newMaxColumns       = Math.ceil(maxLineLength / 10) * 10;
+            maxLineLength       = cm.display.maxLineLength;
+            
+            if (maxLineLength > MINIMUM_COLUMNS) {
+                newMaxColumns = Math.ceil(maxLineLength / 10) * 10;
+            } else {
+                newMaxColumns = MINIMUM_COLUMNS;
+            }
             
             if (newMaxColumns < currentMaxColumns) {
                 // Remove Ruler Numbers
-                console.log("Remove Ruler Numbers");
+                $currentElement = $("#number-right-filler");
+                $currentElement.prev().remove();
+                
+                for (i = (currentMaxColumns - 10); i > newMaxColumns; i -= 10) {
+                    $currentElement.prev().remove();    
+                    $currentElement.prev().remove();
+                }
+                
+                $currentElement.prev().remove();
+                $currentElement.prev().attr("colspan", 6);
+                
                 // Remove Ruler Tick Marks
-                console.log("Remove Tick Marks");
+                $currentElement = $("#tick-mark-right-filler");
+                
+                for (i = currentMaxColumns; i > newMaxColumns; i--) {
+                    $currentElement.prev().remove();
+                }
             } else if (newMaxColumns > currentMaxColumns) {
                 // Add Ruler Numbers
                 $currentElement = $("#number-right-filler").prev();
@@ -231,9 +247,7 @@ define(function (require, exports, module) {
                     $currentElement.after($newElement);
                     $currentElement = $currentElement.next();
                 }
-            } else {
-                return;
-            }
+            } // else they are equal so do nothing...
         }
     }
     
@@ -282,7 +296,7 @@ define(function (require, exports, module) {
         
         _updateRulerLength();
     }
-      
+    
     function _handleEditorChange(event, newEditor, oldEditor) {
         if (newEditor) {
             $(newEditor).on("scroll", _updateRulerScroll);
