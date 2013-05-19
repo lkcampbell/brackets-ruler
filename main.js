@@ -53,6 +53,7 @@ define(function (require, exports, module) {
         _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
         _rulerHTML      = require("text!ruler-template.html"),
         _currentDoc     = null,
+        _currentEditor  = null,
         _rulerLength    = MINIMUM_COLUMNS;
     
     var $rulerPanel     = null;
@@ -294,6 +295,17 @@ define(function (require, exports, module) {
     }
     
     function _handleDocumentChange() {
+        if (_currentEditor) {
+            $(_currentEditor).off("scroll", _updateRulerScroll);
+        }
+        
+        _currentEditor = EditorManager.getCurrentFullEditor();
+        
+        if (_currentEditor) {
+            $(_currentEditor).on("scroll", _updateRulerScroll);
+            _currentEditor.refresh();
+        }
+        
         if (_currentDoc) {
             $(_currentDoc).off("change", _updateRulerLength);
             _currentDoc.releaseRef();
@@ -306,26 +318,13 @@ define(function (require, exports, module) {
             _currentDoc.addRef();
         }
         
+        _updateRulerScroll();
         _updateRulerLength();
     }
-    
-    function _handleEditorChange(event, newEditor, oldEditor) {
-        if (newEditor) {
-            $(newEditor).on("scroll", _updateRulerScroll);
-            newEditor.refresh();
-        }
-        
-        if (oldEditor) {
-            $(oldEditor).off("scroll", _updateRulerScroll);
-        }
-        
-        _updateRulerScroll();
-    }
-    
+
     // --- Initialize Extension ---
     AppInit.appReady(function () {
-        var rulerEnabled    = _prefs.getValue("enabled"),
-            editor          = null;
+        var rulerEnabled    = _prefs.getValue("enabled");
         
         // Register command
         CommandManager.register(COMMAND_NAME, COMMAND_ID, _toggleRuler);
@@ -340,7 +339,6 @@ define(function (require, exports, module) {
         
         // Add Event Listeners
         $(ViewCommandHandlers).on("fontSizeChange", _updateTickMarks);
-        $(EditorManager).on("activeEditorChange", _handleEditorChange);
         $(DocumentManager).on("currentDocumentChange", _handleDocumentChange);
         
         // Load the ruler CSS and create the ruler
@@ -349,10 +347,10 @@ define(function (require, exports, module) {
                 $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
                 $("#editor-holder").before($rulerPanel);
                 
-                editor = EditorManager.getCurrentFullEditor();
+                _currentEditor = EditorManager.getCurrentFullEditor();
                 
-                if (editor) {
-                    $(editor).on("scroll", _updateRulerScroll);
+                if (_currentEditor) {
+                    $(_currentEditor).on("scroll", _updateRulerScroll);
                 }
                 
                 _currentDoc = DocumentManager.getCurrentDocument();
