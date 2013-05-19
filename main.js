@@ -295,16 +295,8 @@ define(function (require, exports, module) {
     }
     
     function _handleDocumentChange() {
-        if (_currentEditor) {
-            $(_currentEditor).off("scroll", _updateRulerScroll);
-        }
-        
-        _currentEditor = EditorManager.getCurrentFullEditor();
-        
-        if (_currentEditor) {
-            $(_currentEditor).on("scroll", _updateRulerScroll);
-            _currentEditor.refresh();
-        }
+        var command         = CommandManager.get(COMMAND_ID),
+            rulerEnabled    = command.getChecked();
         
         if (_currentDoc) {
             $(_currentDoc).off("change", _updateRulerLength);
@@ -316,10 +308,27 @@ define(function (require, exports, module) {
         if (_currentDoc) {
             $(_currentDoc).on("change", _updateRulerLength);
             _currentDoc.addRef();
+        } else {
+            _hideRuler();
+            return;
         }
         
-        _updateRulerScroll();
-        _updateRulerLength();
+        if (_currentEditor) {
+            $(_currentEditor).off("scroll", _updateRulerScroll);
+        }
+        
+        _currentEditor = EditorManager.getCurrentFullEditor();
+        
+        if (_currentEditor) {
+            $(_currentEditor).on("scroll", _updateRulerScroll);
+            _currentEditor.refresh();
+        }
+        
+        if (rulerEnabled) {
+            _showRuler();
+        } else {
+            _hideRuler();
+        }
     }
 
     // --- Initialize Extension ---
@@ -347,17 +356,20 @@ define(function (require, exports, module) {
                 $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
                 $("#editor-holder").before($rulerPanel);
                 
-                _currentEditor = EditorManager.getCurrentFullEditor();
-                
-                if (_currentEditor) {
-                    $(_currentEditor).on("scroll", _updateRulerScroll);
-                }
-                
                 _currentDoc = DocumentManager.getCurrentDocument();
                 
                 if (_currentDoc) {
                     $(_currentDoc).on("change", _updateRulerLength);
                     _currentDoc.addRef();
+                } else {
+                    _hideRuler();
+                    return;
+                }
+                
+                _currentEditor = EditorManager.getCurrentFullEditor();
+                
+                if (_currentEditor) {
+                    $(_currentEditor).on("scroll", _updateRulerScroll);
                 }
                 
                 if (rulerEnabled) {
