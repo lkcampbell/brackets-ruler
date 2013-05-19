@@ -231,7 +231,7 @@ define(function (require, exports, module) {
                 for (i = (currentMaxColumns + 1); i <= newMaxColumns; i++) {
                     $newElement = $("<td></td>");
                     
-                    if (i % 10) {
+                    if (i % 5) {
                         // Minor Tick Mark
                         $newElement.attr("class", "minor-tick-mark");
                     } else {
