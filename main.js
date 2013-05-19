@@ -32,6 +32,7 @@ define(function (require, exports, module) {
     var PreferencesManager  = brackets.getModule("preferences/PreferencesManager"),
         Menus               = brackets.getModule("command/Menus"),
         EditorManager       = brackets.getModule("editor/EditorManager"),
+        Editor              = brackets.getModule("editor/Editor").Editor,
         CommandManager      = brackets.getModule("command/CommandManager"),
         AppInit             = brackets.getModule("utils/AppInit"),
         DocumentManager     = brackets.getModule("document/DocumentManager"),
@@ -167,7 +168,18 @@ define(function (require, exports, module) {
         if (cm) {
             $currentElement     = $("#number-right-filler").prev();
             currentMaxColumns   = parseInt($currentElement.text(), 10);
-            maxLineLength       = cm.display.maxLineLength;
+            
+            // CodeMirror does not provide the maxLineLength of the document
+            // if word wrap is enabled.  If word wrap is on, this workaround
+            // code flips it off, grabs the maxLineLength, then flips it back
+            // on again.
+            if (Editor.getWordWrap()) {
+                Editor.setWordWrap(false);
+                maxLineLength = cm.display.maxLineLength;
+                Editor.setWordWrap(true);
+            } else {
+                maxLineLength = cm.display.maxLineLength;
+            }
             
             if (maxLineLength > MINIMUM_COLUMNS) {
                 newMaxColumns = Math.ceil(maxLineLength / 10) * 10;
@@ -181,7 +193,7 @@ define(function (require, exports, module) {
                 $currentElement.prev().remove();
                 
                 for (i = (currentMaxColumns - 10); i > newMaxColumns; i -= 10) {
-                    $currentElement.prev().remove();    
+                    $currentElement.prev().remove();
                     $currentElement.prev().remove();
                 }
                 
