@@ -14,15 +14,17 @@ into Extension URL field.
 Toggle the extension with **Brackets > View > Toggle Ruler** or use the
 shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
+Click, or click and drag, on the ruler to set a column guide at that point. Click
+on the same point to remove the column guide.
+
 ### Known Issues
 
 **CodeMirror Themes:** Officially, I'm only making sure the column ruler
 works with the Default theme for Brackets. Unofficially, the ruler works
-correctly with most of the other CodeMirror themes as well. The problem
-cases are themes with different fonts (e.g. Rubyblue) and themes with
-drastically styled gutters (e.g. Solarized). If you find a bug with
-the ruler please make sure you can reproduce the bug while using the
-Default theme before you open an issue on it.
+correctly with most of the other CodeMirror themes as well. Themes that
+do not use the SourceCodePro font do not work correctly.  If you find
+a bug with the ruler please make sure you can reproduce the bug while
+using the Default theme before you open an issue on it.
 
 ### Roadmap
 
@@ -30,9 +32,6 @@ Default theme before you open an issue on it.
    * Create UI
       * Hook in Click event to toggle guide
       * Hook in Drag event to move guide left and right
-   * Create UI for word wrap guide
-      * Hook in Click and Double Click event to toggle word wrap guide
-      * Hook word wrap guide to current Brackets word wrap code
   
 * Nice But Not Necessary
    * Change CSS to LESS (proper namespacing of styles)
