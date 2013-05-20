@@ -1,4 +1,3 @@
-/* Reset all table attributes */
 #brackets-ruler table,
 #brackets-ruler tbody,
 #brackets-ruler tr,
@@ -10,7 +9,6 @@
     font: inherit;
 }
 
-/* Ruler styles */
 #brackets-ruler {
     background-color: #3C3F41;
     overflow: hidden;
@@ -23,7 +21,6 @@
     width: 0;
 }
 
-/* Ruler styles */
 #brackets-ruler .numbers {
     color: #ffffff;
 }
@@ -58,4 +55,11 @@
 #brackets-ruler #tick-mark-left-filler:before,
 #brackets-ruler #tick-mark-right-filler:before {
     display: none;
+}
+
+#brackets-ruler-column-guide:before {
+    content: "";
+    background-color: rgba(128, 128, 128, 0.5);
+    position: absolute;
+    z-index: 1000;
 }

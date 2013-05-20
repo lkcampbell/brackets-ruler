@@ -40,21 +40,24 @@ define(function (require, exports, module) {
         ExtensionUtils      = brackets.getModule("utils/ExtensionUtils");
     
     // --- Constants ---
-    var COMMAND_NAME    = "Toggle Ruler",
-        COMMAND_ID      = "lkcampbell.toggle-ruler",
-        SHORTCUT_KEY    = "Ctrl-Alt-R";
+    var RULER_COMMAND_NAME  = "Toggle Ruler",
+        RULER_COMMAND_ID    = "lkcampbell.toggle-ruler",
+        RULER_SHORTCUT_KEY  = "Ctrl-Alt-R";
+    
+    var GUIDE_COMMAND_NAME  = "Toggle Column Guide",
+        GUIDE_COMMAND_ID    = "lkcampbell.toggle-column-guide",
+        GUIDE_SHORTCUT_KEY  = "Ctrl-Alt-G";
     
     var MINIMUM_COLUMNS = 80,   // Must be multiple of ten
         MAX_NUMBER_SIZE = 12;   // Measured in pixel units
     
     // --- Private variables ---
-    var _defPrefs       = { enabled: false },
+    var _defPrefs       = { rulerEnabled: false, guideEnabled: false },
         _prefs          = PreferencesManager.getPreferenceStorage(module, _defPrefs),
         _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
         _rulerHTML      = require("text!ruler-template.html"),
         _currentDoc     = null,
-        _currentEditor  = null,
-        _rulerLength    = MINIMUM_COLUMNS;
+        _currentEditor  = null;
     
     var $rulerPanel     = null;
     
@@ -108,10 +111,13 @@ define(function (require, exports, module) {
     };
       
     // --- Private functions ---
+    function _updateColumnGuide(event) {
+        console.log(event);
+    }
+    
     function _updateRulerScroll() {
         var editor              = EditorManager.getCurrentFullEditor(),
             cm                  = editor ? editor._codeMirror : null,
-            rulerHidden         = false,
             $cmSizer            = null,
             sizerMarginWidth    = 0,
             linePaddingWidth    = 0,
@@ -281,11 +287,11 @@ define(function (require, exports, module) {
     }
     
     function _toggleRuler() {
-        var command         = CommandManager.get(COMMAND_ID),
-            rulerEnabled    = !command.getChecked();
+        var rulerCommand    = CommandManager.get(RULER_COMMAND_ID),
+            rulerEnabled    = !rulerCommand.getChecked();
         
-        command.setChecked(rulerEnabled);
-        _prefs.setValue("enabled", rulerEnabled);
+        rulerCommand.setChecked(rulerEnabled);
+        _prefs.setValue("rulerEnabled", rulerEnabled);
         
         if (rulerEnabled) {
             _showRuler();
@@ -294,9 +300,25 @@ define(function (require, exports, module) {
         }
     }
     
+    function _toggleColumnGuide() {
+        var guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
+            guideEnabled    = !guideCommand.getChecked();
+        
+        guideCommand.setChecked(guideEnabled);
+        _prefs.setValue("rulerEnabled", guideEnabled);
+        
+        if (guideEnabled) {
+            console.log("Calling _showGuide()");
+//            _showGuide();
+        } else {
+            console.log("Calling _hideGuide()");
+//            _hideGuide();
+        }
+    }
+    
     function _handleDocumentChange() {
-        var command         = CommandManager.get(COMMAND_ID),
-            rulerEnabled    = command.getChecked();
+        var rulerCommand    = CommandManager.get(RULER_COMMAND_ID),
+            rulerEnabled    = rulerCommand.getChecked();
         
         if (_currentDoc) {
             $(_currentDoc).off("change", _updateRulerLength);
@@ -333,18 +355,22 @@ define(function (require, exports, module) {
 
     // --- Initialize Extension ---
     AppInit.appReady(function () {
-        var rulerEnabled    = _prefs.getValue("enabled");
+        var rulerEnabled    = _prefs.getValue("rulerEnabled"),
+            guideEnabled    = _prefs.getValue("guideEnabled");
         
-        // Register command
-        CommandManager.register(COMMAND_NAME, COMMAND_ID, _toggleRuler);
+        // Register commands
+        CommandManager.register(RULER_COMMAND_NAME, RULER_COMMAND_ID, _toggleRuler);
+        CommandManager.register(GUIDE_COMMAND_NAME, GUIDE_COMMAND_ID, _toggleColumnGuide);
         
         // Add to View menu
         if (_viewMenu) {
-            _viewMenu.addMenuItem(COMMAND_ID, SHORTCUT_KEY);
+            _viewMenu.addMenuItem(RULER_COMMAND_ID, RULER_SHORTCUT_KEY);
+            _viewMenu.addMenuItem(GUIDE_COMMAND_ID, GUIDE_SHORTCUT_KEY);
         }
         
         // Apply user preferences
-        CommandManager.get(COMMAND_ID).setChecked(rulerEnabled);
+        CommandManager.get(RULER_COMMAND_ID).setChecked(rulerEnabled);
+        CommandManager.get(GUIDE_COMMAND_ID).setChecked(guideEnabled);
         
         // Add Event Listeners
         $(ViewCommandHandlers).on("fontSizeChange", _updateTickMarks);
@@ -354,6 +380,7 @@ define(function (require, exports, module) {
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
                 $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
+                $rulerPanel.click(_updateColumnGuide);
                 $("#editor-holder").before($rulerPanel);
                 
                 _currentDoc = DocumentManager.getCurrentDocument();
