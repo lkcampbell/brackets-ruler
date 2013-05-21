@@ -23,7 +23,7 @@
  */
 
 /*jslint vars: true, plusplus: true, devel: true, regexp: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define, brackets, $, Mustache */
+/*global define, brackets, $, Mustache, window */
 
 define(function (require, exports, module) {
     "use strict";
@@ -52,14 +52,17 @@ define(function (require, exports, module) {
         MAX_NUMBER_SIZE = 12;   // Measured in pixel units
     
     // --- Private variables ---
-    var _defPrefs       = { rulerEnabled: false, guideEnabled: false },
+    var _defPrefs       = { rulerEnabled:   false,
+                            guideEnabled:   false,
+                            guideColumn:    MINIMUM_COLUMNS },
         _prefs          = PreferencesManager.getPreferenceStorage(module, _defPrefs),
         _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
         _rulerHTML      = require("text!ruler-template.html"),
         _currentDoc     = null,
-        _currentEditor  = null;
+        _currentEditor  = null,
+        _guideColumn    = MINIMUM_COLUMNS;
     
-    var $rulerPanel     = null;
+    var _$rulerPanel     = null;
     
     var _templateFunctions = {
         "rulerNumber": function () {
@@ -111,7 +114,11 @@ define(function (require, exports, module) {
     };
       
     // --- Private functions ---
-    function _updateColumnGuide(event) {
+    function _updateGuideHeight(event) {
+        console.log(event);
+    }
+    
+    function _updateGuideColumn(event) {
         console.log(event);
     }
     
@@ -125,7 +132,7 @@ define(function (require, exports, module) {
             rulerOffset         = 0,
             $ruler              = $("#brackets-ruler #ruler");
         
-        if ($rulerPanel.is(":hidden")) { return; }
+        if (_$rulerPanel.is(":hidden")) { return; }
         
         if (cm) {
             // Scroll the ruler to the proper horizontal position
@@ -147,7 +154,7 @@ define(function (require, exports, module) {
             $tickMarks      = $("#brackets-ruler .tick-marks"),
             $rulerNumbers   = $("#brackets-ruler .numbers");
         
-        if ($rulerPanel.is(":hidden")) { return; }
+        if (_$rulerPanel.is(":hidden")) { return; }
         
         $tickMarks.css("font-size", fontSize);
         
@@ -170,7 +177,7 @@ define(function (require, exports, module) {
             $newElement         = null,
             i                   = 0;
         
-        if ($rulerPanel.is(":hidden")) { return; }
+        if (_$rulerPanel.is(":hidden")) { return; }
         
         if (cm) {
             $currentElement     = $("#number-right-filler").prev();
@@ -271,7 +278,7 @@ define(function (require, exports, module) {
     }
     
     function _showRuler() {
-        $rulerPanel.show();
+        _$rulerPanel.show();
         EditorManager.resizeEditor();
         
         // Full ruler updates must occur ONLY when the ruler is visible.
@@ -282,7 +289,7 @@ define(function (require, exports, module) {
     }
     
     function _hideRuler() {
-        $rulerPanel.hide();
+        _$rulerPanel.hide();
         EditorManager.resizeEditor();
     }
     
@@ -356,7 +363,8 @@ define(function (require, exports, module) {
     // --- Initialize Extension ---
     AppInit.appReady(function () {
         var rulerEnabled    = _prefs.getValue("rulerEnabled"),
-            guideEnabled    = _prefs.getValue("guideEnabled");
+            guideEnabled    = _prefs.getValue("guideEnabled"),
+            _guideColumn    = _prefs.getValue("guideColumn");
         
         // Register commands
         CommandManager.register(RULER_COMMAND_NAME, RULER_COMMAND_ID, _toggleRuler);
@@ -375,13 +383,14 @@ define(function (require, exports, module) {
         // Add Event Listeners
         $(ViewCommandHandlers).on("fontSizeChange", _updateTickMarks);
         $(DocumentManager).on("currentDocumentChange", _handleDocumentChange);
+        $(window).resize(_updateGuideHeight);
         
         // Load the ruler CSS and create the ruler
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
-                $rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
-                $rulerPanel.click(_updateColumnGuide);
-                $("#editor-holder").before($rulerPanel);
+                _$rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
+                _$rulerPanel.click(_updateGuideColumn);
+                $("#editor-holder").before(_$rulerPanel);
                 
                 _currentDoc = DocumentManager.getCurrentDocument();
                 
