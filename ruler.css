@@ -21,21 +21,21 @@
     width: 0;
 }
 
-#brackets-ruler .numbers {
+#brackets-ruler .br-numbers {
     color: #ffffff;
 }
 
-#brackets-ruler .number {
+#brackets-ruler .br-number {
     text-align: center;
 }
 
-#brackets-ruler .tick-marks {
+#brackets-ruler .br-tick-marks {
     font-family: 'SourceCodePro';
     line-height: 0;
 }
 
-#brackets-ruler .major-tick-mark:before,
-#brackets-ruler .minor-tick-mark:before {
+#brackets-ruler .br-major-tick-mark:before,
+#brackets-ruler .br-minor-tick-mark:before {
     content: "";
     position: relative;
     display: block;
@@ -44,16 +44,16 @@
     width: 1px;
 }
 
-#brackets-ruler .major-tick-mark:before {
+#brackets-ruler .br-major-tick-mark:before {
     background-color: #ffffff;
 }
 
-#brackets-ruler .minor-tick-mark:before {
+#brackets-ruler .br-minor-tick-mark:before {
     background-color: #8e9a9d;
 }
 
-#brackets-ruler #tick-mark-left-filler:before,
-#brackets-ruler #tick-mark-right-filler:before {
+#brackets-ruler #br-tick-mark-left-filler:before,
+#brackets-ruler #br-tick-mark-right-filler:before {
     display: none;
 }
 

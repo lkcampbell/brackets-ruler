@@ -71,7 +71,7 @@ define(function (require, exports, module) {
             
             for (i = 10; i <= MINIMUM_COLUMNS; i += 10) {
                 finalHTML += '                ';
-                finalHTML += '<td class="number" colspan="';
+                finalHTML += '<td class="br-number" colspan="';
                 finalHTML += (i === MINIMUM_COLUMNS) ? '6' : '9';
                 finalHTML += '">';
                 finalHTML += i;
@@ -80,7 +80,7 @@ define(function (require, exports, module) {
                 if (i !== MINIMUM_COLUMNS) {
                     finalHTML += '\n';
                     finalHTML += '                ';
-                    finalHTML += '<td class="number"></td>';
+                    finalHTML += '<td class="br-number"></td>';
                     finalHTML += '\n';
                 }
             }
@@ -95,12 +95,12 @@ define(function (require, exports, module) {
                 
                 if (i % 5) {
                     // Minor tick mark
-                    finalHTML += '<td class="minor-tick-mark" id="tick-';
+                    finalHTML += '<td class="br-minor-tick-mark" id="br-tick-';
                     finalHTML += i;
                     finalHTML += '">&nbsp;</td>';
                 } else {
                     // Major tick mark
-                    finalHTML += '<td class="major-tick-mark" id="tick-';
+                    finalHTML += '<td class="br-major-tick-mark" id="br-tick-';
                     finalHTML += i;
                     finalHTML += '">&nbsp;</td>';
                 }
@@ -130,7 +130,7 @@ define(function (require, exports, module) {
             linePaddingWidth    = 0,
             tickWidth           = 0,
             rulerOffset         = 0,
-            $ruler              = $("#brackets-ruler #ruler");
+            $ruler              = $("#brackets-ruler #br-ruler");
         
         if (_$rulerPanel.is(":hidden")) { return; }
         
@@ -139,7 +139,7 @@ define(function (require, exports, module) {
             $cmSizer            = $(cm.getScrollerElement()).find(".CodeMirror-sizer");
             sizerMarginWidth    = parseInt($cmSizer.css("margin-left"), 10);
             linePaddingWidth    = parseInt($(".CodeMirror pre").css("padding-left"), 10);
-            tickWidth           = $("#brackets-ruler #tick-mark-left-filler").width();
+            tickWidth           = $("#brackets-ruler #br-tick-mark-left-filler").width();
             rulerOffset         = sizerMarginWidth + linePaddingWidth;
             rulerOffset         -= Math.ceil(tickWidth * 1.5);
             rulerOffset         -= cm.getScrollInfo().left;
@@ -151,8 +151,8 @@ define(function (require, exports, module) {
     
     function _updateTickMarks() {
         var fontSize        = $(".CodeMirror").css("font-size"),
-            $tickMarks      = $("#brackets-ruler .tick-marks"),
-            $rulerNumbers   = $("#brackets-ruler .numbers");
+            $tickMarks      = $("#brackets-ruler .br-tick-marks"),
+            $rulerNumbers   = $("#brackets-ruler .br-numbers");
         
         if (_$rulerPanel.is(":hidden")) { return; }
         
@@ -180,7 +180,7 @@ define(function (require, exports, module) {
         if (_$rulerPanel.is(":hidden")) { return; }
         
         if (cm) {
-            $currentElement     = $("#number-right-filler").prev();
+            $currentElement     = $("#br-number-right-filler").prev();
             currentMaxColumns   = parseInt($currentElement.text(), 10);
             
             // CodeMirror does not provide the maxLineLength of the document
@@ -203,7 +203,7 @@ define(function (require, exports, module) {
             
             if (newMaxColumns < currentMaxColumns) {
                 // Remove Ruler Numbers
-                $currentElement = $("#number-right-filler");
+                $currentElement = $("#br-number-right-filler");
                 $currentElement.prev().remove();
                 
                 for (i = (currentMaxColumns - 10); i > newMaxColumns; i -= 10) {
@@ -215,23 +215,23 @@ define(function (require, exports, module) {
                 $currentElement.prev().attr("colspan", 6);
                 
                 // Remove Ruler Tick Marks
-                $currentElement = $("#tick-mark-right-filler");
+                $currentElement = $("#br-tick-mark-right-filler");
                 
                 for (i = currentMaxColumns; i > newMaxColumns; i--) {
                     $currentElement.prev().remove();
                 }
             } else if (newMaxColumns > currentMaxColumns) {
                 // Add Ruler Numbers
-                $currentElement = $("#number-right-filler").prev();
+                $currentElement = $("#br-number-right-filler").prev();
                 $currentElement.attr("colspan", 9);
                 $newElement = $("<td></td>");
-                $newElement.attr("class", "number");
+                $newElement.attr("class", "br-number");
                 $currentElement.after($newElement);
                 $currentElement = $currentElement.next();
                 
                 for (i = (currentMaxColumns + 10); i <= newMaxColumns; i += 10) {
                     $newElement = $("<td></td>");
-                    $newElement.attr("class", "number");
+                    $newElement.attr("class", "br-number");
                     
                     if (i !== newMaxColumns) {
                         $newElement.attr("colspan", 9);
@@ -245,27 +245,27 @@ define(function (require, exports, module) {
                     
                     if (i !== newMaxColumns) {
                         $newElement = $("<td></td>");
-                        $newElement.attr("class", "number");
+                        $newElement.attr("class", "br-number");
                         $currentElement = $currentElement.after($newElement);
                         $currentElement = $currentElement.next();
                     }
                 }
                 
                 // Add Ruler Tick Marks
-                $currentElement = $("#tick-mark-right-filler").prev();
+                $currentElement = $("#br-tick-mark-right-filler").prev();
                 
                 for (i = (currentMaxColumns + 1); i <= newMaxColumns; i++) {
                     $newElement = $("<td></td>");
                     
                     if (i % 5) {
                         // Minor Tick Mark
-                        $newElement.attr("class", "minor-tick-mark");
+                        $newElement.attr("class", "br-minor-tick-mark");
                     } else {
                         // Major Tick Mark
-                        $newElement.attr("class", "major-tick-mark");
+                        $newElement.attr("class", "br-major-tick-mark");
                     }
                     
-                    $newElement.attr("id", "tick-" + i);
+                    $newElement.attr("id", "br-tick-" + i);
                     
                     // Insert non-breaking space character
                     $newElement.text("\xa0");
