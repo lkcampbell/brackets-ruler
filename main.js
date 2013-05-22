@@ -62,26 +62,26 @@ define(function (require, exports, module) {
         _currentEditor  = null,
         _guideColumn    = MINIMUM_COLUMNS;
     
-    var _$rulerPanel     = null;
+    var _$rulerPanel = null;
     
     var _templateFunctions = {
         "rulerNumber": function () {
             var i           = 0,
-                finalHTML   = '';
+                finalHTML   = "";
             
             for (i = 10; i <= MINIMUM_COLUMNS; i += 10) {
-                finalHTML += '                ';
-                finalHTML += '<td class="br-number" colspan="';
-                finalHTML += (i === MINIMUM_COLUMNS) ? '6' : '9';
-                finalHTML += '">';
+                finalHTML += "                ";
+                finalHTML += "<td class='br-number' colspan='";
+                finalHTML += (i === MINIMUM_COLUMNS) ? "6" : "9";
+                finalHTML += "'>";
                 finalHTML += i;
-                finalHTML += '</td>';
+                finalHTML += "</td>";
                 
                 if (i !== MINIMUM_COLUMNS) {
-                    finalHTML += '\n';
-                    finalHTML += '                ';
-                    finalHTML += '<td class="br-number"></td>';
-                    finalHTML += '\n';
+                    finalHTML += "\n";
+                    finalHTML += "                ";
+                    finalHTML += "<td class='br-number'></td>";
+                    finalHTML += "\n";
                 }
             }
             return finalHTML;
@@ -95,14 +95,14 @@ define(function (require, exports, module) {
                 
                 if (i % 5) {
                     // Minor tick mark
-                    finalHTML += '<td class="br-minor-tick-mark" id="br-tick-';
+                    finalHTML += "<td class='br-minor-tick-mark' id='br-tick-";
                     finalHTML += i;
-                    finalHTML += '">&nbsp;</td>';
+                    finalHTML += "'>&nbsp;</td>";
                 } else {
                     // Major tick mark
-                    finalHTML += '<td class="br-major-tick-mark" id="br-tick-';
+                    finalHTML += "<td class='br-major-tick-mark' id='br-tick-";
                     finalHTML += i;
-                    finalHTML += '">&nbsp;</td>';
+                    finalHTML += "'>&nbsp;</td>";
                 }
                 
                 if (i !== MINIMUM_COLUMNS) {
@@ -388,10 +388,12 @@ define(function (require, exports, module) {
         // Load the ruler CSS and create the ruler
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
+                // Create Ruler
                 _$rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
                 _$rulerPanel.click(_updateGuideColumn);
                 $("#editor-holder").before(_$rulerPanel);
                 
+                // Attach Event Listeners
                 _currentDoc = DocumentManager.getCurrentDocument();
                 
                 if (_currentDoc) {
@@ -408,6 +410,7 @@ define(function (require, exports, module) {
                     $(_currentEditor).on("scroll", _updateRulerScroll);
                 }
                 
+                // Show/Hide Ruler
                 if (rulerEnabled) {
                     _showRuler();
                 } else {
