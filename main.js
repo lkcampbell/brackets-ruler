@@ -37,6 +37,7 @@ define(function (require, exports, module) {
         AppInit             = brackets.getModule("utils/AppInit"),
         DocumentManager     = brackets.getModule("document/DocumentManager"),
         ViewCommandHandlers = brackets.getModule("view/ViewCommandHandlers"),
+        PanelManager        = brackets.getModule("view/PanelManager"),
         ExtensionUtils      = brackets.getModule("utils/ExtensionUtils");
     
     // --- Constants ---
@@ -453,7 +454,7 @@ define(function (require, exports, module) {
         // Add Event Listeners
         $(ViewCommandHandlers).on("fontSizeChange", _updateTickMarks);
         $(DocumentManager).on("currentDocumentChange", _handleDocumentChange);
-        $(window).resize(_updateGuideHeight);
+        $(PanelManager).on("editorAreaResize", _updateGuideHeight);
         
         // Load the ruler CSS and create the ruler
         ExtensionUtils.loadStyleSheet(module, "ruler.css")

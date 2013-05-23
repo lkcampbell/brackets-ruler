@@ -41,4 +41,4 @@ using the Default theme before you open an issue on it.
 MIT-licensed -- see `main.js` for details.
 
 ### Compatibility
-Tested on Brackets Sprint 25 and later, Windows 7.
+Tested on Brackets Sprint 26 and later, Windows 7.
