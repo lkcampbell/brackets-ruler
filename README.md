@@ -11,11 +11,12 @@ into Extension URL field.
 3. Click on the **Install** button.
 
 ### How to Use Ruler
-Toggle the extension with **Brackets > View > Toggle Ruler** or use the
+Toggle the Column Ruler with **Brackets > View > Toggle Ruler** or use the
 shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
-Click, or click and drag, on the ruler to set a column guide at that point. Click
-on the same point to remove the column guide.
+Toggle the Column Guide with **Brackets > View > Toggle Column Guide** or
+use the shortcut key which is **Ctrl-Alt-G** on Windows and **Command-Alt-G**
+on Mac.
 
 ### Known Issues
 
@@ -29,10 +30,9 @@ using the Default theme before you open an issue on it.
 ### Roadmap
 
 * Column guide
-   * Create UI
-      * Hook in Click event to toggle guide
-      * Hook in Drag event to move guide left and right
-  
+   * Add ability to toggle guide with ruler click events
+   * Make guide adjustable via ruler click and drag events
+
 * Nice But Not Necessary
    * Update ruler when changing themes in Themes extension
    * Clean up ruler HTML-generator code using jQuery
