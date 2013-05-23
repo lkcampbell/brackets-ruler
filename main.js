@@ -506,6 +506,8 @@ define(function (require, exports, module) {
                     _hideRuler();
                 }
                 
+                EditorManager.resizeEditor();
+                
                 // Show/Hide Column Guide
                 if (guideEnabled) {
                     _showGuide();
