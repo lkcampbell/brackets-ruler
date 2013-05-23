@@ -431,12 +431,27 @@ define(function (require, exports, module) {
         }
         
         // Update Ruler
+        _updateTickMarks();
         _updateRulerScroll();
         _updateRulerLength();
         
         // Update Column Guide
         _updateGuideHeight();
         _updateGuidePosX();
+        
+        // Show/Hide Ruler
+        if (rulerEnabled) {
+            _showRuler();
+        } else {
+            _hideRuler();
+        }
+        
+        // Show/Hide Column Guide
+        if (guideEnabled) {
+            _showGuide();
+        } else {
+            _hideGuide();
+        }
     }
 
     // --- Initialize Extension ---
