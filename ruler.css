@@ -57,9 +57,9 @@
     display: none;
 }
 
-#brackets-ruler-column-guide:before {
-    content: "";
+#brackets-ruler-column-guide {
     background-color: rgba(128, 128, 128, 0.5);
     position: absolute;
+    width: 1px;
     z-index: 1000;
 }

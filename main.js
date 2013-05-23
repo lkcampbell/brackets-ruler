@@ -52,17 +52,18 @@ define(function (require, exports, module) {
         MAX_NUMBER_SIZE = 12;   // Measured in pixel units
     
     // --- Private variables ---
-    var _defPrefs       = { rulerEnabled:   false,
-                            guideEnabled:   false,
-                            guideColumn:    MINIMUM_COLUMNS },
-        _prefs          = PreferencesManager.getPreferenceStorage(module, _defPrefs),
-        _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
-        _rulerHTML      = require("text!ruler-template.html"),
-        _currentDoc     = null,
-        _currentEditor  = null,
-        _guideColumn    = MINIMUM_COLUMNS;
+    var _defPrefs           = { rulerEnabled:       false,
+                                guideEnabled:       false,
+                                guideColumnNumber:  MINIMUM_COLUMNS },
+        _prefs              = PreferencesManager.getPreferenceStorage(module, _defPrefs),
+        _viewMenu           = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
+        _rulerHTML          = require("text!ruler-template.html"),
+        _currentDoc         = null,
+        _currentEditor      = null,
+        _guideColumnNumber  = MINIMUM_COLUMNS;
     
-    var _$rulerPanel = null;
+    var _$rulerPanel    = null,
+        _$columnGuide   = null;
     
     var _templateFunctions = {
         "rulerNumber": function () {
@@ -114,12 +115,39 @@ define(function (require, exports, module) {
     };
       
     // --- Private functions ---
-    function _updateGuideHeight(event) {
-        console.log(event);
+    function _updateGuideHeight() {
+        var editor      = EditorManager.getCurrentFullEditor(),
+            cm          = editor ? editor._codeMirror : null,
+            guideHeight = 0;
+        
+        if (cm) {
+            guideHeight = cm.getScrollInfo().clientHeight;
+            guideHeight = (guideHeight > 0) ? guideHeight : 0;
+            
+            if (_$columnGuide) {
+                _$columnGuide.height(guideHeight);
+            }
+        }
     }
     
-    function _updateGuideColumn(event) {
-        console.log(event);
+    function _updateGuideColumnNumber() {
+        var $tickMark   = null,
+            $ruler      = null,
+            rulerPosX   = 0,
+            tickPosX    = 0,
+            tickWidth   = 0,
+            guidePosX   = 0;
+        
+        $ruler      = $("#brackets-ruler #br-ruler");
+        $tickMark   = $("#brackets-ruler #br-tick-" + _guideColumnNumber);
+        
+        if ($ruler && $tickMark) {
+            rulerPosX   = $ruler.position().left;
+            tickPosX    = $tickMark.position().left;
+            tickWidth   = $tickMark.width();
+            guidePosX   = rulerPosX + tickPosX + Math.ceil(tickWidth * 0.5);
+            _$columnGuide.css("left", guidePosX + "px");
+        }
     }
     
     function _updateRulerScroll() {
@@ -165,6 +193,7 @@ define(function (require, exports, module) {
         }
         
         _updateRulerScroll();
+        _updateGuideColumnNumber();
     }
     
     function _updateRulerLength() {
@@ -307,25 +336,40 @@ define(function (require, exports, module) {
         }
     }
     
+    function _showGuide() {
+        _updateGuideColumnNumber();
+        _updateGuideHeight();
+        _$columnGuide.show();
+    }
+    
+    function _hideGuide() {
+        _$columnGuide.hide();
+    }
+    
     function _toggleColumnGuide() {
         var guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
             guideEnabled    = !guideCommand.getChecked();
         
         guideCommand.setChecked(guideEnabled);
-        _prefs.setValue("rulerEnabled", guideEnabled);
+        _prefs.setValue("guideEnabled", guideEnabled);
         
         if (guideEnabled) {
-            console.log("Calling _showGuide()");
-//            _showGuide();
+            _showGuide();
         } else {
-            console.log("Calling _hideGuide()");
-//            _hideGuide();
+            _hideGuide();
         }
+    }
+    
+    function _handleRulerClick(event) {
+        console.log("Called _handleRulerClick...");
+        console.log(event);
     }
     
     function _handleDocumentChange() {
         var rulerCommand    = CommandManager.get(RULER_COMMAND_ID),
-            rulerEnabled    = rulerCommand.getChecked();
+            rulerEnabled    = rulerCommand.getChecked(),
+            guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
+            guideEnabled    = guideCommand.getChecked();
         
         if (_currentDoc) {
             $(_currentDoc).off("change", _updateRulerLength);
@@ -353,10 +397,18 @@ define(function (require, exports, module) {
             _currentEditor.refresh();
         }
         
+        // Show/Hide Ruler
         if (rulerEnabled) {
             _showRuler();
         } else {
             _hideRuler();
+        }
+        
+        // Show/Hide Column Guide
+        if (guideEnabled) {
+            _showGuide();
+        } else {
+            _hideGuide();
         }
     }
 
@@ -390,8 +442,12 @@ define(function (require, exports, module) {
             .done(function () {
                 // Create Ruler
                 _$rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
-                _$rulerPanel.click(_updateGuideColumn);
+                _$rulerPanel.click(_handleRulerClick);
                 $("#editor-holder").before(_$rulerPanel);
+                
+                // Create Column Guide
+                _$columnGuide = $("<div id='brackets-ruler-column-guide'></div>");
+                $("#editor-holder").prepend(_$columnGuide);
                 
                 // Attach Event Listeners
                 _currentDoc = DocumentManager.getCurrentDocument();
@@ -415,6 +471,13 @@ define(function (require, exports, module) {
                     _showRuler();
                 } else {
                     _hideRuler();
+                }
+                
+                // Show/Hide Column Guide
+                if (guideEnabled) {
+                    _showGuide();
+                } else {
+                    _hideGuide();
                 }
             });
     });
