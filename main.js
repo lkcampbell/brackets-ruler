@@ -421,19 +421,13 @@ define(function (require, exports, module) {
             _currentEditor.refresh();
         }
         
-        // Show/Hide Ruler
-        if (rulerEnabled) {
-            _showRuler();
-        } else {
-            _hideRuler();
-        }
+        // Update Ruler
+        _updateRulerScroll();
+        _updateRulerLength();
         
-        // Show/Hide Column Guide
-        if (guideEnabled) {
-            _showGuide();
-        } else {
-            _hideGuide();
-        }
+        // Update Column Guide
+        _updateGuideHeight();
+        _updateGuideColumnNumber();
     }
 
     // --- Initialize Extension ---
