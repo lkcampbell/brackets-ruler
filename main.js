@@ -49,19 +49,20 @@ define(function (require, exports, module) {
         GUIDE_COMMAND_ID    = "lkcampbell.toggle-column-guide",
         GUIDE_SHORTCUT_KEY  = "Ctrl-Alt-G";
     
-    var MINIMUM_COLUMNS = 80,   // Must be multiple of ten
+    var MIN_COLUMNS = 80,       // Must be multiple of ten
+        MAX_COLUMNS = 1000,     // Must be multiple of ten
         MAX_NUMBER_SIZE = 12;   // Measured in pixel units
     
     // --- Private variables ---
     var _defPrefs           = { rulerEnabled:       false,
                                 guideEnabled:       false,
-                                guideColumnNumber:  MINIMUM_COLUMNS },
+                                guideColumnNumber:  MIN_COLUMNS },
         _prefs              = PreferencesManager.getPreferenceStorage(module, _defPrefs),
         _viewMenu           = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
         _rulerHTML          = require("text!ruler-template.html"),
         _currentDoc         = null,
         _currentEditor      = null,
-        _guideColumnNumber  = MINIMUM_COLUMNS;
+        _guideColumnNumber  = MIN_COLUMNS;
     
     var _$rulerPanel    = null,
         _$columnGuide   = null;
@@ -71,15 +72,15 @@ define(function (require, exports, module) {
             var i           = 0,
                 finalHTML   = "";
             
-            for (i = 10; i <= MINIMUM_COLUMNS; i += 10) {
+            for (i = 10; i <= MIN_COLUMNS; i += 10) {
                 finalHTML += "                ";
                 finalHTML += "<td class='br-number' colspan='";
-                finalHTML += (i === MINIMUM_COLUMNS) ? "6" : "9";
+                finalHTML += (i === MIN_COLUMNS) ? "6" : "9";
                 finalHTML += "'>";
                 finalHTML += i;
                 finalHTML += "</td>";
                 
-                if (i !== MINIMUM_COLUMNS) {
+                if (i !== MIN_COLUMNS) {
                     finalHTML += "\n";
                     finalHTML += "                ";
                     finalHTML += "<td class='br-number'></td>";
@@ -92,7 +93,7 @@ define(function (require, exports, module) {
             var i           = 0,
                 finalHTML   = '';
             
-            for (i = 0; i <= MINIMUM_COLUMNS; i++) {
+            for (i = 0; i <= MIN_COLUMNS; i++) {
                 finalHTML += '                ';
                 
                 if (i % 5) {
@@ -107,7 +108,7 @@ define(function (require, exports, module) {
                     finalHTML += "'>&nbsp;</td>";
                 }
                 
-                if (i !== MINIMUM_COLUMNS) {
+                if (i !== MIN_COLUMNS) {
                     finalHTML += '\n';
                 }
             }
@@ -304,10 +305,15 @@ define(function (require, exports, module) {
                 maxLineLength = cm.display.maxLineLength;
             }
             
-            if (maxLineLength > MINIMUM_COLUMNS) {
+            if (maxLineLength > MIN_COLUMNS) {
                 newMaxColumns = Math.ceil(maxLineLength / 10) * 10;
             } else {
-                newMaxColumns = MINIMUM_COLUMNS;
+                newMaxColumns = MIN_COLUMNS;
+            }
+            
+            // Ruler causes some performance issues if it gets too long
+            if (newMaxColumns > MAX_COLUMNS) {
+                newMaxColumns = MAX_COLUMNS;
             }
             
             if (newMaxColumns < currentMaxColumns) {
