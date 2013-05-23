@@ -34,7 +34,6 @@ using the Default theme before you open an issue on it.
       * Hook in Drag event to move guide left and right
   
 * Nice But Not Necessary
-   * Change CSS to LESS (proper namespacing of styles)
    * Update ruler when changing themes in Themes extension
    * Clean up ruler HTML-generator code using jQuery
 

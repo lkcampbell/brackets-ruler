@@ -133,6 +133,7 @@ define(function (require, exports, module) {
     function _updateGuideColumnNumber() {
         var $tickMark   = null,
             $ruler      = null,
+            rulerHidden = false,
             rulerPosX   = 0,
             tickPosX    = 0,
             tickWidth   = 0,
@@ -140,19 +141,30 @@ define(function (require, exports, module) {
         
         $ruler      = $("#brackets-ruler #br-ruler");
         $tickMark   = $("#brackets-ruler #br-tick-" + _guideColumnNumber);
+        rulerHidden = _$rulerPanel.is(":hidden");
         
-        if ($ruler && $tickMark) {
-            rulerPosX   = $ruler.position().left;
-            tickPosX    = $tickMark.position().left;
-            tickWidth   = $tickMark.width();
-            guidePosX   = rulerPosX + tickPosX + Math.ceil(tickWidth * 0.5);
-            _$columnGuide.css("left", guidePosX + "px");
+        // Can only get the position of an element if it is visible
+        // If the ruler if not visible, show it temporary...
+        if (rulerHidden) {
+            _showRuler();
+        }
+        
+        rulerPosX   = $ruler.position().left;
+        tickPosX    = $tickMark.position().left;
+        tickWidth   = $tickMark.width();
+        guidePosX   = rulerPosX + tickPosX + Math.ceil(tickWidth * 0.5);
+        _$columnGuide.css("left", guidePosX + "px");
+        
+        // ...then hide the ruler again
+        if (rulerHidden) {
+            _hideRuler();
         }
     }
     
     function _updateRulerScroll() {
         var editor              = EditorManager.getCurrentFullEditor(),
             cm                  = editor ? editor._codeMirror : null,
+            rulerHidden         = _$rulerPanel.is(":hidden"),
             $cmSizer            = null,
             sizerMarginWidth    = 0,
             linePaddingWidth    = 0,
@@ -160,10 +172,13 @@ define(function (require, exports, module) {
             rulerOffset         = 0,
             $ruler              = $("#brackets-ruler #br-ruler");
         
-        if (_$rulerPanel.is(":hidden")) { return; }
-        
         if (cm) {
-            // Scroll the ruler to the proper horizontal position
+            // Can only get the width of an element if it is visible
+            // If the ruler if not visible, show it temporary...
+            if (rulerHidden) {
+                _showRuler();
+            }
+            
             $cmSizer            = $(cm.getScrollerElement()).find(".CodeMirror-sizer");
             sizerMarginWidth    = parseInt($cmSizer.css("margin-left"), 10);
             linePaddingWidth    = parseInt($(".CodeMirror pre").css("padding-left"), 10);
@@ -172,6 +187,11 @@ define(function (require, exports, module) {
             rulerOffset         -= Math.ceil(tickWidth * 1.5);
             rulerOffset         -= cm.getScrollInfo().left;
             $ruler.css("left", rulerOffset + "px");
+            
+            // ...then hide the ruler again
+            if (rulerHidden) {
+                _hideRuler();
+            }
         } else {
             $ruler.css("left", "0px");
         }
@@ -181,8 +201,6 @@ define(function (require, exports, module) {
         var fontSize        = $(".CodeMirror").css("font-size"),
             $tickMarks      = $("#brackets-ruler .br-tick-marks"),
             $rulerNumbers   = $("#brackets-ruler .br-numbers");
-        
-        if (_$rulerPanel.is(":hidden")) { return; }
         
         $tickMarks.css("font-size", fontSize);
         
@@ -205,8 +223,6 @@ define(function (require, exports, module) {
             $currentElement     = null,
             $newElement         = null,
             i                   = 0;
-        
-        if (_$rulerPanel.is(":hidden")) { return; }
         
         if (cm) {
             $currentElement     = $("#br-number-right-filler").prev();
@@ -307,19 +323,17 @@ define(function (require, exports, module) {
     }
     
     function _showRuler() {
-        _$rulerPanel.show();
-        EditorManager.resizeEditor();
-        
-        // Full ruler updates must occur ONLY when the ruler is visible.
-        // jQuery doesn't return width() for hidden elements.
-        _updateTickMarks();
-        _updateRulerScroll();
-        _updateRulerLength();
+        if (_$rulerPanel.is(":hidden")) {
+            _$rulerPanel.show();
+            EditorManager.resizeEditor();
+        }
     }
     
     function _hideRuler() {
-        _$rulerPanel.hide();
-        EditorManager.resizeEditor();
+        if (_$rulerPanel.is(":visible")) {
+            _$rulerPanel.hide();
+            EditorManager.resizeEditor();
+        }
     }
     
     function _toggleRuler() {
@@ -465,6 +479,15 @@ define(function (require, exports, module) {
                 if (_currentEditor) {
                     $(_currentEditor).on("scroll", _updateRulerScroll);
                 }
+                
+                // Update Ruler
+                _updateTickMarks();
+                _updateRulerScroll();
+                _updateRulerLength();
+                
+                // Update Column Guide
+                _updateGuideHeight();
+                _updateGuideColumnNumber();
                 
                 // Show/Hide Ruler
                 if (rulerEnabled) {
