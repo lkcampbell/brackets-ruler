@@ -114,7 +114,68 @@ define(function (require, exports, module) {
         }
     };
       
-    // --- Private functions ---
+    // --- UI Show/Hide functions ---
+    function _showRuler(skipResize) {
+        if (_$rulerPanel.is(":hidden")) {
+            _$rulerPanel.show();
+            
+            if (!skipResize) {
+                EditorManager.resizeEditor();
+            }
+        }
+    }
+    
+    function _hideRuler(skipResize) {
+        if (_$rulerPanel.is(":visible")) {
+            _$rulerPanel.hide();
+            
+            if (!skipResize) {
+                EditorManager.resizeEditor();
+            }
+        }
+    }
+    
+    function _toggleRuler() {
+        var rulerCommand    = CommandManager.get(RULER_COMMAND_ID),
+            rulerEnabled    = !rulerCommand.getChecked();
+        
+        rulerCommand.setChecked(rulerEnabled);
+        _prefs.setValue("rulerEnabled", rulerEnabled);
+        
+        if (rulerEnabled) {
+            _showRuler();
+        } else {
+            _hideRuler();
+        }
+    }
+    
+    function _showGuide() {
+        if (_$columnGuide.is(":hidden")) {
+            _$columnGuide.show();
+        }
+    }
+    
+    function _hideGuide() {
+        if (_$columnGuide.is(":visible")) {
+            _$columnGuide.hide();
+        }
+    }
+    
+    function _toggleColumnGuide() {
+        var guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
+            guideEnabled    = !guideCommand.getChecked();
+        
+        guideCommand.setChecked(guideEnabled);
+        _prefs.setValue("guideEnabled", guideEnabled);
+        
+        if (guideEnabled) {
+            _showGuide();
+        } else {
+            _hideGuide();
+        }
+    }
+    
+    // --- UI Update functions ---
     function _updateGuideHeight() {
         var editor      = EditorManager.getCurrentFullEditor(),
             cm          = editor ? editor._codeMirror : null,
@@ -146,7 +207,7 @@ define(function (require, exports, module) {
         // Can only get the position of an element if it is visible
         // If the ruler if not visible, show it temporary...
         if (rulerHidden) {
-            _showRuler();
+            _showRuler(true);
         }
         
         rulerPosX   = $ruler.position().left;
@@ -157,7 +218,7 @@ define(function (require, exports, module) {
         
         // ...then hide the ruler again
         if (rulerHidden) {
-            _hideRuler();
+            _hideRuler(true);
         }
     }
     
@@ -176,7 +237,7 @@ define(function (require, exports, module) {
             // Can only get the width of an element if it is visible
             // If the ruler if not visible, show it temporary...
             if (rulerHidden) {
-                _showRuler();
+                _showRuler(true);
             }
             
             $cmSizer            = $(cm.getScrollerElement()).find(".CodeMirror-sizer");
@@ -190,7 +251,7 @@ define(function (require, exports, module) {
             
             // ...then hide the ruler again
             if (rulerHidden) {
-                _hideRuler();
+                _hideRuler(true);
             }
         } else {
             $ruler.css("left", "0px");
@@ -322,58 +383,7 @@ define(function (require, exports, module) {
         }
     }
     
-    function _showRuler() {
-        if (_$rulerPanel.is(":hidden")) {
-            _$rulerPanel.show();
-            EditorManager.resizeEditor();
-        }
-    }
-    
-    function _hideRuler() {
-        if (_$rulerPanel.is(":visible")) {
-            _$rulerPanel.hide();
-            EditorManager.resizeEditor();
-        }
-    }
-    
-    function _toggleRuler() {
-        var rulerCommand    = CommandManager.get(RULER_COMMAND_ID),
-            rulerEnabled    = !rulerCommand.getChecked();
-        
-        rulerCommand.setChecked(rulerEnabled);
-        _prefs.setValue("rulerEnabled", rulerEnabled);
-        
-        if (rulerEnabled) {
-            _showRuler();
-        } else {
-            _hideRuler();
-        }
-    }
-    
-    function _showGuide() {
-        _updateGuideColumnNumber();
-        _updateGuideHeight();
-        _$columnGuide.show();
-    }
-    
-    function _hideGuide() {
-        _$columnGuide.hide();
-    }
-    
-    function _toggleColumnGuide() {
-        var guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
-            guideEnabled    = !guideCommand.getChecked();
-        
-        guideCommand.setChecked(guideEnabled);
-        _prefs.setValue("guideEnabled", guideEnabled);
-        
-        if (guideEnabled) {
-            _showGuide();
-        } else {
-            _hideGuide();
-        }
-    }
-    
+    // --- Event Handlers ---
     function _handleRulerClick(event) {
         console.log("Called _handleRulerClick...");
         console.log(event);
