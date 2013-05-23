@@ -257,6 +257,8 @@ define(function (require, exports, module) {
         } else {
             $ruler.css("left", "0px");
         }
+        
+        _updateGuideColumnNumber();
     }
     
     function _updateTickMarks() {
