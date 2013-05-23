@@ -14,7 +14,7 @@
     overflow: hidden;
 }
 
-#brackets-ruler table {
+#brackets-ruler #br-ruler {
     border-collapse: collapse;
     border-spacing: 0;
     position: relative;

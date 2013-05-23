@@ -458,7 +458,7 @@ define(function (require, exports, module) {
         $(DocumentManager).on("currentDocumentChange", _handleDocumentChange);
         $(PanelManager).on("editorAreaResize", _updateGuideHeight);
         
-        // Load the ruler CSS and create the ruler
+        // Load the ruler CSS
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
                 // Create Ruler
