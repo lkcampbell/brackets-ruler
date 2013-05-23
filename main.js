@@ -192,7 +192,7 @@ define(function (require, exports, module) {
         }
     }
     
-    function _updateGuideColumnNumber() {
+    function _updateGuidePosX() {
         var $tickMark   = null,
             $ruler      = null,
             rulerHidden = false,
@@ -206,7 +206,7 @@ define(function (require, exports, module) {
         rulerHidden = _$rulerPanel.is(":hidden");
         
         // Can only get the position of an element if it is visible
-        // If the ruler if not visible, show it temporary...
+        // If the ruler if not visible, show it temporarily...
         if (rulerHidden) {
             _showRuler(true);
         }
@@ -236,7 +236,7 @@ define(function (require, exports, module) {
         
         if (cm) {
             // Can only get the width of an element if it is visible
-            // If the ruler if not visible, show it temporary...
+            // If the ruler if not visible, show it temporarily...
             if (rulerHidden) {
                 _showRuler(true);
             }
@@ -258,7 +258,7 @@ define(function (require, exports, module) {
             $ruler.css("left", "0px");
         }
         
-        _updateGuideColumnNumber();
+        _updateGuidePosX();
     }
     
     function _updateTickMarks() {
@@ -275,7 +275,7 @@ define(function (require, exports, module) {
         }
         
         _updateRulerScroll();
-        _updateGuideColumnNumber();
+        _updateGuidePosX();
     }
     
     function _updateRulerLength() {
@@ -430,7 +430,7 @@ define(function (require, exports, module) {
         
         // Update Column Guide
         _updateGuideHeight();
-        _updateGuideColumnNumber();
+        _updateGuidePosX();
     }
 
     // --- Initialize Extension ---
@@ -494,7 +494,7 @@ define(function (require, exports, module) {
                 
                 // Update Column Guide
                 _updateGuideHeight();
-                _updateGuideColumnNumber();
+                _updateGuidePosX();
                 
                 // Show/Hide Ruler
                 if (rulerEnabled) {
