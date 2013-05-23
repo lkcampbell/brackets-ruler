@@ -2,8 +2,6 @@
 An extension for [Brackets](https://github.com/adobe/brackets/) that adds
 an adjustable column ruler to the editor.
 
-This extension is still being built.  See the Roadmap section for more details.
-
 ### How to Install
 1. Select **Brackets > File > Install Extension...**
 2. Paste https://github.com/lkcampbell/brackets-ruler
@@ -18,6 +16,10 @@ Toggle the Column Guide with **Brackets > View > Toggle Column Guide** or
 use the shortcut key which is **Ctrl-Alt-G** on Windows and **Command-Alt-G**
 on Mac.
 
+Click on any of the tick marks on the ruler to set the Column Guide to a
+different column.  Clicking on the Column Guide's tick mark will hide the
+column guide.
+
 ### Known Issues
 
 **CodeMirror Themes:** Officially, I'm only making sure the column ruler
@@ -30,7 +32,7 @@ using the Default theme before you open an issue on it.
 ### Roadmap
 
 * Column guide
-   * Add ability to toggle guide with ruler click events
+   * Ruler click events should fire off when clicking on any part of the ruler
    * Make guide adjustable via ruler click and drag events
 
 * Nice But Not Necessary
