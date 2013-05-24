@@ -422,6 +422,24 @@ define(function (require, exports, module) {
     }
     
     // --- Event Handlers ---
+    function _handleFontSizeChange() {
+        _updateTickMarks();
+    }
+    
+    function _handleEditorResize() {
+        // TODO: Only update the guide height on vertical resize
+        _updateGuideHeight();
+    }
+    
+    function _handleTextChange() {
+        _updateRulerLength();
+    }
+    
+    function _handleEditorScroll() {
+        // TODO: Only update the ruler on horizontal scroll
+        _updateRulerScroll();
+    }
+    
     function _handleRulerClick(event) {
         var tickRegExp      = /^br-tick-(\d+)$/,
             targetID        = event.target.id,
@@ -439,20 +457,20 @@ define(function (require, exports, module) {
                 _toggleColumnGuide();
                 guideEnabled = guideCommand.getChecked();
             } else {
+                guideEnabled    = true;
                 _guideColumnNum = newColumnNum;
-                _updateGuidePosX();
+                // New guide column number may affect length of ruler
+                _updateRulerLength();
+                // _updateGuidePosX() is called by _updateRulerLength() 
                 _showGuide();
-                guideEnabled = true;
             }
-            
-            _updateRulerLength();
-        }
-        //else {
+        } //else {
             // Get new column number from position of click
             // *** TO BE IMPLEMENTED ***
         //}
         
         guideCommand.setChecked(guideEnabled);
+        
         _prefs.setValue("guideEnabled", guideEnabled);
         _prefs.setValue("guideColumnNum", _guideColumnNum);
     }
@@ -471,7 +489,7 @@ define(function (require, exports, module) {
         _currentDoc = DocumentManager.getCurrentDocument();
         
         if (_currentDoc) {
-            $(_currentDoc).on("change", _updateRulerLength);
+            $(_currentDoc).on("change", _handleTextChange);
             _currentDoc.addRef();
         } else {
             _hideRuler();
@@ -485,7 +503,7 @@ define(function (require, exports, module) {
         _currentEditor = EditorManager.getCurrentFullEditor();
         
         if (_currentEditor) {
-            $(_currentEditor).on("scroll", _updateRulerScroll);
+            $(_currentEditor).on("scroll", _handleEditorScroll);
             _currentEditor.refresh();
         }
         
@@ -506,7 +524,7 @@ define(function (require, exports, module) {
             _hideGuide();
         }
     }
-
+    
     // --- Initialize Extension ---
     AppInit.appReady(function () {
         var rulerEnabled    = _prefs.getValue("rulerEnabled"),
@@ -528,9 +546,9 @@ define(function (require, exports, module) {
         _guideColumnNum = _prefs.getValue("guideColumnNum");
         
         // Add Event Listeners
-        $(ViewCommandHandlers).on("fontSizeChange", _updateTickMarks);
+        $(ViewCommandHandlers).on("fontSizeChange", _handleFontSizeChange);
         $(DocumentManager).on("currentDocumentChange", _handleDocumentChange);
-        $(PanelManager).on("editorAreaResize", _updateGuideHeight);
+        $(PanelManager).on("editorAreaResize", _handleEditorResize);
         
         // Load the ruler CSS
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
@@ -548,7 +566,7 @@ define(function (require, exports, module) {
                 _currentDoc = DocumentManager.getCurrentDocument();
                 
                 if (_currentDoc) {
-                    $(_currentDoc).on("change", _updateRulerLength);
+                    $(_currentDoc).on("change", _handleTextChange);
                     _currentDoc.addRef();
                 } else {
                     _hideRuler();
@@ -558,7 +576,7 @@ define(function (require, exports, module) {
                 _currentEditor = EditorManager.getCurrentFullEditor();
                 
                 if (_currentEditor) {
-                    $(_currentEditor).on("scroll", _updateRulerScroll);
+                    $(_currentEditor).on("scroll", _handleEditorScroll);
                 }
                 
                 // Update Ruler and Column Guide
