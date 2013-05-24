@@ -245,9 +245,12 @@ define(function (require, exports, module) {
             // code flips it off, grabs the maxLineLength, then flips it back
             // on again.
             if (Editor.getWordWrap()) {
-                Editor.setWordWrap(false);
-                maxLineLength = cm.display.maxLineLength;
-                Editor.setWordWrap(true);
+                // Wrap it in an operation so the word wrap flip can't be seen
+                cm.operation(function () {
+                    Editor.setWordWrap(false);
+                    maxLineLength = cm.display.maxLineLength;
+                    Editor.setWordWrap(true);
+                });
             } else {
                 maxLineLength = cm.display.maxLineLength;
             }
