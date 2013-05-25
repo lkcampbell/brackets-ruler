@@ -514,8 +514,13 @@ define(function (require, exports, module) {
         if (_currentDoc) {
             $(_currentDoc).on("change", _handleTextChange);
             _currentDoc.addRef();
+            CommandManager.get(RULER_COMMAND_ID).setEnabled(true);
+            CommandManager.get(GUIDE_COMMAND_ID).setEnabled(true);
         } else {
             _hideRuler();
+            _hideGuide();
+            CommandManager.get(RULER_COMMAND_ID).setEnabled(false);
+            CommandManager.get(GUIDE_COMMAND_ID).setEnabled(false);
             return;
         }
         
