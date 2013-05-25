@@ -114,8 +114,20 @@ define(function (require, exports, module) {
             return finalHTML;
         }
     };
-      
-    // --- UI Show/Hide functions ---
+    
+    // --- Show/Hide functions ---
+    function _showGuide() {
+        if (_$columnGuide.is(":hidden")) {
+            _$columnGuide.show();
+        }
+    }
+    
+    function _hideGuide() {
+        if (_$columnGuide.is(":visible")) {
+            _$columnGuide.hide();
+        }
+    }
+    
     function _showRuler(skipResize) {
         if (_$rulerPanel.is(":hidden")) {
             _$rulerPanel.show();
@@ -136,47 +148,7 @@ define(function (require, exports, module) {
         }
     }
     
-    function _toggleRuler() {
-        var rulerCommand    = CommandManager.get(RULER_COMMAND_ID),
-            rulerEnabled    = !rulerCommand.getChecked();
-        
-        rulerCommand.setChecked(rulerEnabled);
-        _prefs.setValue("rulerEnabled", rulerEnabled);
-        
-        if (rulerEnabled) {
-            _showRuler();
-        } else {
-            _hideRuler();
-        }
-    }
-    
-    function _showGuide() {
-        if (_$columnGuide.is(":hidden")) {
-            _$columnGuide.show();
-        }
-    }
-    
-    function _hideGuide() {
-        if (_$columnGuide.is(":visible")) {
-            _$columnGuide.hide();
-        }
-    }
-    
-    function _toggleColumnGuide() {
-        var guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
-            guideEnabled    = !guideCommand.getChecked();
-        
-        guideCommand.setChecked(guideEnabled);
-        _prefs.setValue("guideEnabled", guideEnabled);
-        
-        if (guideEnabled) {
-            _showGuide();
-        } else {
-            _hideGuide();
-        }
-    }
-    
-    // --- UI Update functions ---    
+    // --- Update Column Guide functions ---
     function _updateGuidePosX() {
         var $tickMark   = null,
             $ruler      = null,
@@ -243,6 +215,7 @@ define(function (require, exports, module) {
         }
     }
     
+    // --- Update Ruler functions ---
     function _updateRulerLength() {
         var editor              = EditorManager.getCurrentFullEditor(),
             cm                  = editor ? editor._codeMirror : null,
@@ -439,6 +412,36 @@ define(function (require, exports, module) {
         // _updateGuidePosX(),
         // _updateGuideHeight(),
         // _updateGuideZIndex() are all called by _updateRulerLength()
+    }
+    
+    // --- Toggle functions ---
+    function _toggleColumnGuide() {
+        var guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
+            guideEnabled    = !guideCommand.getChecked();
+        
+        guideCommand.setChecked(guideEnabled);
+        _prefs.setValue("guideEnabled", guideEnabled);
+        
+        if (guideEnabled) {
+            _showGuide();
+            _updateGuideZIndex();
+        } else {
+            _hideGuide();
+        }
+    }
+    
+    function _toggleRuler() {
+        var rulerCommand    = CommandManager.get(RULER_COMMAND_ID),
+            rulerEnabled    = !rulerCommand.getChecked();
+        
+        rulerCommand.setChecked(rulerEnabled);
+        _prefs.setValue("rulerEnabled", rulerEnabled);
+        
+        if (rulerEnabled) {
+            _showRuler();
+        } else {
+            _hideRuler();
+        }
     }
     
     // --- Event Handlers ---
