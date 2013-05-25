@@ -60,6 +60,7 @@
 #brackets-ruler-column-guide {
     background-color: rgba(128, 128, 128, 0.5);
     position: absolute;
+    overflow: hidden;
     width: 1px;
-    z-index: 1000;
+    z-index: 1;
 }

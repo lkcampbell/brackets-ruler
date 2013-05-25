@@ -176,22 +176,7 @@ define(function (require, exports, module) {
         }
     }
     
-    // --- UI Update functions ---
-    function _updateGuideHeight() {
-        var editor      = EditorManager.getCurrentFullEditor(),
-            cm          = editor ? editor._codeMirror : null,
-            guideHeight = 0;
-        
-        if (cm) {
-            guideHeight = cm.getScrollInfo().clientHeight;
-            guideHeight = (guideHeight > 0) ? guideHeight : 0;
-            
-            if (_$columnGuide) {
-                _$columnGuide.height(guideHeight);
-            }
-        }
-    }
-    
+    // --- UI Update functions ---    
     function _updateGuidePosX() {
         var $tickMark   = null,
             $ruler      = null,
@@ -223,7 +208,39 @@ define(function (require, exports, module) {
         }
         
         _prefs.setValue("guideColumnNum", _guideColumnNum);
-        _updateGuideHeight();
+    }
+    
+    function _updateGuideHeight() {
+        var editor      = EditorManager.getCurrentFullEditor(),
+            cm          = editor ? editor._codeMirror : null,
+            guideHeight = 0;
+        
+        if (cm) {
+            guideHeight = cm.getScrollInfo().clientHeight;
+            guideHeight = (guideHeight > 0) ? guideHeight : 0;
+            
+            if (_$columnGuide) {
+                _$columnGuide.height(guideHeight);
+            }
+        }
+    }
+    
+    function _updateGuideZIndex() {
+        var editor      = EditorManager.getCurrentFullEditor(),
+            cm          = editor ? editor._codeMirror : null,
+            editorWidth = 0,
+            guideXPos   = 0,
+            guideZIndex = 0;
+        
+        // If the guide falls outside of the bounds of the editor window,
+        // change its z-index so it isn't drawn on top of the main toolbar.
+        if (cm) {
+            editorWidth = cm.getScrollInfo().clientWidth;
+            editorWidth = (editorWidth > 0) ? editorWidth : 0;
+            guideXPos   = _$columnGuide.position().left;
+            guideZIndex = (guideXPos <= editorWidth) ? 1 : 0;
+            _$columnGuide.css("z-index", guideZIndex);
+        }
     }
     
     function _updateRulerLength() {
@@ -346,6 +363,8 @@ define(function (require, exports, module) {
             } // else they are equal so do nothing...
                 
             _updateGuidePosX();
+            _updateGuideHeight();
+            _updateGuideZIndex();
         }
     }
     
@@ -407,7 +426,7 @@ define(function (require, exports, module) {
         // This it nothing but a more appropriately named wrapper function
         // for _updateTickMarks().  All of the update function calls are
         // chained together, so calling _updateTickMarks() effectively
-        // calls all update function in sequential order.  Many of the
+        // calls all update functions in sequential order.  Many of the
         // update functions have dependencies on other update functions,
         // so don't change the calling order or things might break.
         
@@ -417,8 +436,9 @@ define(function (require, exports, module) {
         // _updateRulerLength() is called by _updateRulerScroll()
         
         // --- Update Column Guide ---
-        // _updateGuidePosX() is called by _updateRulerLength()
-        // _updateGuideHeight() is called by _updateGuidePosX()
+        // _updateGuidePosX(),
+        // _updateGuideHeight(),
+        // _updateGuideZIndex() are all called by _updateRulerLength()
     }
     
     // --- Event Handlers ---
@@ -427,8 +447,8 @@ define(function (require, exports, module) {
     }
     
     function _handleEditorResize() {
-        // TODO: Only update the guide height on vertical resize
         _updateGuideHeight();
+        _updateGuideZIndex();
     }
     
     function _handleTextChange() {
