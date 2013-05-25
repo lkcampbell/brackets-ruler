@@ -16,9 +16,9 @@ Toggle the Column Guide with **Brackets > View > Toggle Column Guide** or
 use the shortcut key which is **Ctrl-Alt-G** on Windows and **Command-Alt-G**
 on Mac.
 
-Click on any of the tick marks on the ruler to set the Column Guide to a
-different column.  Clicking on the Column Guide's tick mark will hide the
-column guide.
+Click on any of the tick marks on the ruler to toggle on the Column Guide
+and set it to that column.  Toggle the Column Guide on and off by clicking
+on the same tick mark multiple times.
 
 ### Known Issues
 
@@ -43,4 +43,4 @@ using the Default theme before you open an issue on it.
 MIT-licensed -- see `main.js` for details.
 
 ### Compatibility
-Tested on Brackets Sprint 26 and later, Windows 7.
+Tested on Brackets Sprint 25 and later, Windows 7.
