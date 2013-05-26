@@ -32,7 +32,6 @@ using the Default theme before you open an issue on it.
 ### Roadmap
 
 * Column guide
-   * Ruler click events should fire off when clicking on any part of the ruler
    * Make guide adjustable via ruler click and drag events
 
 * Nice But Not Necessary

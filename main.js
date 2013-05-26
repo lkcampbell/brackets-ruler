@@ -54,9 +54,9 @@ define(function (require, exports, module) {
         MAX_NUMBER_SIZE = 12;   // Measured in pixel units
     
     // --- Private variables ---
-    var _defPrefs       = { rulerEnabled:       false,
-                            guideEnabled:       false,
-                            guideColumnNum:  MIN_COLUMNS },
+    var _defPrefs       = { rulerEnabled:   false,
+                            guideEnabled:   false,
+                            guideColumnNum: MIN_COLUMNS },
         _prefs          = PreferencesManager.getPreferenceStorage(module, _defPrefs),
         _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
         _rulerHTML      = require("text!ruler-template.html"),
@@ -334,7 +334,8 @@ define(function (require, exports, module) {
                     $currentElement = $currentElement.next();
                 }
             } // else they are equal so do nothing...
-                
+            
+            // Update the Column Guide
             _updateGuidePosX();
             _updateGuideHeight();
             _updateGuideZIndex();
@@ -464,33 +465,48 @@ define(function (require, exports, module) {
     }
     
     function _handleRulerClick(event) {
-        var tickRegExp      = /^br-tick-(\d+)$/,
-            targetID        = event.target.id,
+        var clickX          = event.pageX,
+            $allTickMarks   = null,
+            $targetTickMark = null,
+            targetID        = "",
+            tickRegExp      = /^br-tick-(\d+)$/,
             matchResult     = [],
             newColumnNum    = MIN_COLUMNS,
             guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
             guideEnabled    = false;
         
-        if (tickRegExp.test(targetID)) {
-            // Get new column number from the tick mark id
-            matchResult     = targetID.match(tickRegExp);
-            newColumnNum    = parseInt(matchResult[1], 10);
-            
-            if (_guideColumnNum === newColumnNum) {
-                _toggleColumnGuide();
-                guideEnabled = guideCommand.getChecked();
+        $allTickMarks = $(".br-tick-marks").children();
+        
+        $targetTickMark = $allTickMarks.filter(function () {
+            return $(this).offset().left <= clickX;
+        }).filter(function () {
+            return ($(this).offset().left + $(this).outerWidth()) > clickX;
+        });
+        
+        // Take care of the edge cases
+        if ($targetTickMark.length === 0) {
+            if (clickX < $allTickMarks.first().offset().left) {
+                $targetTickMark = $allTickMarks.eq(1);
             } else {
-                guideEnabled    = true;
-                _guideColumnNum = newColumnNum;
-                // New guide column number may affect length of ruler
-                _updateRulerLength();
-                // _updateGuidePosX() is called by _updateRulerLength() 
-                _showGuide();
+                $targetTickMark = $allTickMarks.eq($allTickMarks.length - 2);
             }
-        } //else {
-            // Get new column number from position of click
-            // *** TO BE IMPLEMENTED ***
-        //}
+        }
+        
+        targetID        = $targetTickMark.attr("id");
+        matchResult     = targetID.match(tickRegExp);
+        newColumnNum    = parseInt(matchResult[1], 10);
+        
+        if (_guideColumnNum === newColumnNum) {
+            _toggleColumnGuide();
+            guideEnabled = guideCommand.getChecked();
+        } else {
+            _guideColumnNum = newColumnNum;
+            // New guide column number may affect length of ruler
+            _updateRulerLength();
+            // _updateGuidePosX() is called by _updateRulerLength() 
+            _showGuide();
+            guideEnabled = true;
+        }
         
         guideCommand.setChecked(guideEnabled);
         
