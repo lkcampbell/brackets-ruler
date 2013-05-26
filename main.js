@@ -406,7 +406,7 @@ define(function (require, exports, module) {
         
         // --- Update Ruler ---
         _updateTickMarks();
-        // _updateRulerScroll() is called by _updateTickMarks() 
+        // _updateRulerScroll() is called by _updateTickMarks()
         // _updateRulerLength() is called by _updateRulerScroll()
         
         // --- Update Column Guide ---
@@ -492,7 +492,14 @@ define(function (require, exports, module) {
             }
         }
         
-        targetID        = $targetTickMark.attr("id");
+        targetID = $targetTickMark.attr("id");
+        
+        if (targetID === "br-tick-mark-left-filler") {
+            targetID = $targetTickMark.next().attr("id");
+        } else if (targetID === "br-tick-mark-right-filler") {
+            targetID = $targetTickMark.prev().attr("id");
+        }
+        
         matchResult     = targetID.match(tickRegExp);
         newColumnNum    = parseInt(matchResult[1], 10);
         
@@ -503,7 +510,7 @@ define(function (require, exports, module) {
             _guideColumnNum = newColumnNum;
             // New guide column number may affect length of ruler
             _updateRulerLength();
-            // _updateGuidePosX() is called by _updateRulerLength() 
+            // _updateGuidePosX() is called by _updateRulerLength()
             _showGuide();
             guideEnabled = true;
         }
