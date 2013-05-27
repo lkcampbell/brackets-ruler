@@ -602,6 +602,7 @@ define(function (require, exports, module) {
         
         if (_currentEditor) {
             $(_currentEditor).on("scroll", _handleEditorScroll);
+            _editorScrollPos = _currentEditor.getScrollPos();
             _currentEditor.refresh();
         }
         
