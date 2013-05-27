@@ -17,9 +17,9 @@ Toggle the Column Guide with **Brackets > View > Toggle Column Guide** or
 use the shortcut key which is **Ctrl-Alt-G** on Windows and **Command-Alt-G**
 on Mac.
 
-Click on any of the tick marks on the ruler to toggle on the Column Guide
-and set it to that column.  Toggle the Column Guide on and off by clicking
-on the same tick mark multiple times.
+Clicking on the ruler will toggle the column guide on and off.
+
+Click and drag on the ruler to the set the column guide.
 
 ### Known Issues
 
