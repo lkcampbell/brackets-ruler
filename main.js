@@ -615,6 +615,8 @@ define(function (require, exports, module) {
             _hideRuler();
         }
         
+        EditorManager.resizeEditor();
+        
         // Show/Hide Column Guide
         if (guideEnabled) {
             _showGuide();
@@ -660,42 +662,8 @@ define(function (require, exports, module) {
                 _$columnGuide = $("<div id='brackets-ruler-column-guide'></div>");
                 $("#editor-holder").prepend(_$columnGuide);
                 
-                // Attach Event Listeners
-                _currentDoc = DocumentManager.getCurrentDocument();
-                
-                if (_currentDoc) {
-                    $(_currentDoc).on("change", _handleTextChange);
-                    _currentDoc.addRef();
-                } else {
-                    _hideRuler();
-                    return;
-                }
-                
-                _currentEditor = EditorManager.getCurrentFullEditor();
-                
-                if (_currentEditor) {
-                    $(_currentEditor).on("scroll", _handleEditorScroll);
-                    _editorScrollPos = _currentEditor.getScrollPos();
-                }
-                
-                // Update Ruler and Column Guide
-                _updateAll();
-                
-                // Show/Hide Ruler
-                if (rulerEnabled) {
-                    _showRuler();
-                } else {
-                    _hideRuler();
-                }
-                
-                EditorManager.resizeEditor();
-                
-                // Show/Hide Column Guide
-                if (guideEnabled) {
-                    _showGuide();
-                } else {
-                    _hideGuide();
-                }
+                // Loading a new document so fire off handler
+                _handleDocumentChange();
             });
     });
 });
