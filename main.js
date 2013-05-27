@@ -63,7 +63,8 @@ define(function (require, exports, module) {
         _currentDoc         = null,
         _currentEditor      = null,
         _guideColumnNum     = MIN_COLUMNS,
-        _editorScrollPos    = null;
+        _editorScrollPos    = null,
+        _isDragging         = false;
     
     var _$rulerPanel    = null,
         _$columnGuide   = null;
@@ -473,26 +474,13 @@ define(function (require, exports, module) {
         _editorScrollPos = newScrollPos;
     }
     
-    function _handleRulerDragStop() {
-        _$rulerPanel.off("mousemove");
-        _$rulerPanel.off("mouseup");
-        _$rulerPanel.off("mouseenter");
-    }
-    
-    function _handleRulerDrag(event) {
-        var clickX          = event.pageX,
-            $allTickMarks   = null,
+    function _getTargetColumn(event) {
+        var $allTickMarks   = $(".br-tick-marks").children(),
             $targetTickMark = null,
+            clickX          = event.pageX,
             targetID        = "",
             tickRegExp      = /^br-tick-(\d+)$/,
-            matchResult     = [],
-            newColumnNum    = MIN_COLUMNS,
-            guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
-            guideEnabled    = false;
-        
-        if (!event.which) { _handleRulerDragStop(); }
-        
-        $allTickMarks = $(".br-tick-marks").children();
+            matchResult     = [];
         
         $targetTickMark = $allTickMarks.filter(function () {
             return $(this).offset().left <= clickX;
@@ -517,10 +505,34 @@ define(function (require, exports, module) {
             targetID = $targetTickMark.prev().attr("id");
         }
         
-        matchResult     = targetID.match(tickRegExp);
-        newColumnNum    = parseInt(matchResult[1], 10);
+        matchResult = targetID.match(tickRegExp);
         
-        _guideColumnNum = newColumnNum;
+        return parseInt(matchResult[1], 10);
+    }
+    
+    function _handleRulerDragStop() {
+        _$rulerPanel.off("mousemove");
+        _$rulerPanel.off("mouseup");
+        _$rulerPanel.off("mouseenter");
+        
+        // No dragging === mouse click: toggle guide
+        if (!_isDragging) {
+            _toggleColumnGuide();
+        }
+        
+        _isDragging = false;
+    }
+    
+    function _handleRulerDrag(event) {
+        var newColumnNum    = MIN_COLUMNS,
+            guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
+            guideEnabled    = false;
+        
+        if (!event.which) { _handleRulerDragStop(); }
+        
+        _isDragging = true;
+        
+        _guideColumnNum = _getTargetColumn(event);
         // New guide column number may affect length of ruler
         _updateRulerLength();
         // _updateGuidePosX() is called by _updateRulerLength()
@@ -545,7 +557,15 @@ define(function (require, exports, module) {
         _$rulerPanel.mousemove(_handleRulerDrag);
         _$rulerPanel.mouseup(_handleRulerDragStop);
         _$rulerPanel.mouseenter(_handleRulerMouseEnter);
-        _handleRulerDrag(event);
+        
+        if (_guideColumnNum === _getTargetColumn(event)) {
+            // Possibly a simple mouse click to toggle guide
+            _isDragging = false;
+        } else {
+            // Definitely not a toggle, start the drag column reset
+            _isDragging = true;
+            _handleRulerDrag(event);
+        }
     }
     
     function _handleDocumentChange() {
