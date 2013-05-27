@@ -163,7 +163,7 @@ define(function (require, exports, module) {
         rulerHidden = _$rulerPanel.is(":hidden");
         
         // Can only get the position of an element if it is visible
-        // If the ruler if not visible, show it temporarily...
+        // If the ruler is not visible, show it temporarily...
         if (rulerHidden) {
             _showRuler(true);
         }
@@ -355,7 +355,7 @@ define(function (require, exports, module) {
         
         if (cm) {
             // Can only get the width of an element if it is visible
-            // If the ruler if not visible, show it temporarily...
+            // If the ruler is not visible, show it temporarily...
             if (rulerHidden) {
                 _showRuler(true);
             }
@@ -460,11 +460,16 @@ define(function (require, exports, module) {
     }
     
     function _handleEditorScroll() {
-        // TODO: Only update the ruler on horizontal scroll
         _updateRulerScroll();
     }
     
-    function _handleRulerClick(event) {
+    function _handleRulerDragStop() {
+        _$rulerPanel.off("mousemove");
+        _$rulerPanel.off("mouseup");
+        _$rulerPanel.off("mouseenter");
+    }
+    
+    function _handleRulerDrag(event) {
         var clickX          = event.pageX,
             $allTickMarks   = null,
             $targetTickMark = null,
@@ -474,6 +479,8 @@ define(function (require, exports, module) {
             newColumnNum    = MIN_COLUMNS,
             guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
             guideEnabled    = false;
+        
+        if (!event.which) { _handleRulerDragStop(); }
         
         $allTickMarks = $(".br-tick-marks").children();
         
@@ -503,22 +510,32 @@ define(function (require, exports, module) {
         matchResult     = targetID.match(tickRegExp);
         newColumnNum    = parseInt(matchResult[1], 10);
         
-        if (_guideColumnNum === newColumnNum) {
-            _toggleColumnGuide();
-            guideEnabled = guideCommand.getChecked();
-        } else {
-            _guideColumnNum = newColumnNum;
-            // New guide column number may affect length of ruler
-            _updateRulerLength();
-            // _updateGuidePosX() is called by _updateRulerLength()
-            _showGuide();
-            guideEnabled = true;
-        }
+        _guideColumnNum = newColumnNum;
+        // New guide column number may affect length of ruler
+        _updateRulerLength();
+        // _updateGuidePosX() is called by _updateRulerLength()
+        _showGuide();
         
+        guideEnabled = true;
         guideCommand.setChecked(guideEnabled);
         
         _prefs.setValue("guideEnabled", guideEnabled);
         _prefs.setValue("guideColumnNum", _guideColumnNum);
+    }
+    
+    function _handleRulerMouseEnter(event) {
+        if (event.which === 1) {
+            _handleRulerDrag();
+        } else {
+            _handleRulerDragStop();
+        }
+    }
+    
+    function _handleRulerDragStart(event) {
+        _$rulerPanel.mousemove(_handleRulerDrag);
+        _$rulerPanel.mouseup(_handleRulerDragStop);
+        _$rulerPanel.mouseenter(_handleRulerMouseEnter);
+        _handleRulerDrag(event);
     }
     
     function _handleDocumentChange() {
@@ -606,7 +623,7 @@ define(function (require, exports, module) {
             .done(function () {
                 // Create Ruler
                 _$rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
-                _$rulerPanel.click(_handleRulerClick);
+                _$rulerPanel.mousedown(_handleRulerDragStart);
                 $("#editor-holder").before(_$rulerPanel);
                 
                 // Create Column Guide

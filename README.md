@@ -29,15 +29,6 @@ do not use the SourceCodePro font do not work correctly.  If you find
 a bug with the ruler please make sure you can reproduce the bug while
 using the Default theme before you open an issue on it.
 
-### Roadmap
-
-* Column guide
-   * Make guide adjustable via ruler click and drag events
-
-* Nice But Not Necessary
-   * Update ruler when changing themes in Themes extension
-   * Clean up ruler HTML-generator code using jQuery
-
 ### License
 MIT-licensed -- see `main.js` for details.
 
