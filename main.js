@@ -54,15 +54,16 @@ define(function (require, exports, module) {
         MAX_NUMBER_SIZE = 12;   // Measured in pixel units
     
     // --- Private variables ---
-    var _defPrefs       = { rulerEnabled:   false,
-                            guideEnabled:   false,
-                            guideColumnNum: MIN_COLUMNS },
-        _prefs          = PreferencesManager.getPreferenceStorage(module, _defPrefs),
-        _viewMenu       = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
-        _rulerHTML      = require("text!ruler-template.html"),
-        _currentDoc     = null,
-        _currentEditor  = null,
-        _guideColumnNum = MIN_COLUMNS;
+    var _defPrefs           = { rulerEnabled:   false,
+                                guideEnabled:   false,
+                                guideColumnNum: MIN_COLUMNS },
+        _prefs              = PreferencesManager.getPreferenceStorage(module, _defPrefs),
+        _viewMenu           = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
+        _rulerHTML          = require("text!ruler-template.html"),
+        _currentDoc         = null,
+        _currentEditor      = null,
+        _guideColumnNum     = MIN_COLUMNS,
+        _editorScrollPos    = null;
     
     var _$rulerPanel    = null,
         _$columnGuide   = null;
@@ -460,8 +461,16 @@ define(function (require, exports, module) {
     }
     
     function _handleEditorScroll() {
-        // TODO: Only update on horizontal scroll
-        _updateRulerScroll();
+        var oldScrollX      = _editorScrollPos.x,
+            newScrollPos    = _currentEditor.getScrollPos(),
+            newScrollX      = newScrollPos.x;
+        
+        // Only update on a horizontal scroll
+        if (oldScrollX !== newScrollX) {
+            _updateRulerScroll();
+        }
+        
+        _editorScrollPos = newScrollPos;
     }
     
     function _handleRulerDragStop() {
@@ -646,6 +655,7 @@ define(function (require, exports, module) {
                 
                 if (_currentEditor) {
                     $(_currentEditor).on("scroll", _handleEditorScroll);
+                    _editorScrollPos = _currentEditor.getScrollPos();
                 }
                 
                 // Update Ruler and Column Guide
