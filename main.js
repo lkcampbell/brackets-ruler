@@ -460,6 +460,7 @@ define(function (require, exports, module) {
     }
     
     function _handleEditorScroll() {
+        // TODO: Only update on horizontal scroll
         _updateRulerScroll();
     }
     
@@ -565,7 +566,7 @@ define(function (require, exports, module) {
         }
         
         if (_currentEditor) {
-            $(_currentEditor).off("scroll", _updateRulerScroll);
+            $(_currentEditor).off("scroll", _handleEditorScroll);
         }
         
         _currentEditor = EditorManager.getCurrentFullEditor();
