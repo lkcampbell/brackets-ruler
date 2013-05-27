@@ -3,10 +3,11 @@ An extension for [Brackets](https://github.com/adobe/brackets/) that adds
 an adjustable column ruler to the editor.
 
 ### How to Install
-1. Select **Brackets > File > Install Extension...**
-2. Paste https://github.com/lkcampbell/brackets-ruler
+1. Select **Brackets > File > Extension Manager...**
+2. Click on **Install from URL...**
+3. Paste https://github.com/lkcampbell/brackets-ruler
 into Extension URL field.
-3. Click on the **Install** button.
+4. Click on the **Install** button.
 
 ### How to Use Ruler
 Toggle the Column Ruler with **Brackets > View > Toggle Ruler** or use the
