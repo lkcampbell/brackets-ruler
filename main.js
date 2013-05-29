@@ -667,7 +667,6 @@ define(function (require, exports, module) {
             .done(function () {
                 // Create Ruler
                 _$rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
-                _$rulerPanel.mousedown(_handleRulerDragStart);
                 $("#editor-holder").before(_$rulerPanel);
                 _$rulerPanel.mousedown(_handleRulerDragStart);
                 _$rulerPanel.on("contextmenu", function (e) {
