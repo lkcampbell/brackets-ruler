@@ -530,7 +530,8 @@ define(function (require, exports, module) {
             guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
             guideEnabled    = false;
         
-        if (!event.which) { _handleRulerDragStop(); }
+        // When left mouse button is no longer pressed, stop the drag
+        if (event.which !== 1) { _handleRulerDragStop(); }
         
         _isDragging = true;
         
