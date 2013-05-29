@@ -338,11 +338,6 @@ define(function (require, exports, module) {
                     $currentElement = $currentElement.next();
                 }
             } // else they are equal so do nothing...
-            
-            // Update the Column Guide
-            _updateGuidePosX();
-            _updateGuideHeight();
-            _updateGuideZIndex();
         }
     }
     
@@ -381,7 +376,8 @@ define(function (require, exports, module) {
             $ruler.css("left", "0px");
         }
         
-        _updateRulerLength();
+        // Ruler scroll affects guide's horizontal position so update position
+        _updateGuidePosX();
     }
     
     function _updateTickMarks() {
@@ -397,26 +393,24 @@ define(function (require, exports, module) {
             $rulerNumbers.css("font-size", MAX_NUMBER_SIZE + "px");
         }
         
+        // Tick mark width affects ruler scroll so update scroll
         _updateRulerScroll();
     }
     
     function _updateAll() {
-        // This it nothing but a more appropriately named wrapper function
-        // for _updateTickMarks().  All of the update function calls are
-        // chained together, so calling _updateTickMarks() effectively
-        // calls all update functions in sequential order.  Many of the
-        // update functions have dependencies on other update functions,
-        // so don't change the calling order or things might break.
+        // Note that some of the update functions have dependencies on other
+        // update functions (see comments below), so don't change the calling
+        // order here or things might break.
         
         // --- Update Ruler ---
         _updateTickMarks();
         // _updateRulerScroll() is called by _updateTickMarks()
-        // _updateRulerLength() is called by _updateRulerScroll()
+        _updateRulerLength();
         
         // --- Update Column Guide ---
-        // _updateGuidePosX(),
-        // _updateGuideHeight(),
-        // _updateGuideZIndex() are all called by _updateRulerLength()
+        // _updateGuidePosX() is called by _updateRulerScroll()
+        _updateGuideHeight();
+        _updateGuideZIndex();
     }
     
     // --- Toggle functions ---
@@ -536,9 +530,10 @@ define(function (require, exports, module) {
         _isDragging = true;
         
         _guideColumnNum = _getTargetColumn(event);
+        
         // New guide column number may affect length of ruler
         _updateRulerLength();
-        // _updateGuidePosX() is called by _updateRulerLength()
+        _updateGuidePosX();
         _showGuide();
         
         guideEnabled = true;
