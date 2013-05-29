@@ -446,6 +446,7 @@ define(function (require, exports, module) {
     // --- Event Handlers ---
     function _handleFontSizeChange() {
         _updateTickMarks();
+        _updateGuideHeight();
     }
     
     function _handleEditorResize() {
@@ -465,6 +466,7 @@ define(function (require, exports, module) {
         // Only update on a horizontal scroll
         if (oldScrollX !== newScrollX) {
             _updateRulerScroll();
+            _updateGuideZIndex();
         }
         
         _editorScrollPos = newScrollPos;
@@ -534,6 +536,8 @@ define(function (require, exports, module) {
         // New guide column number may affect length of ruler
         _updateRulerLength();
         _updateGuidePosX();
+        _updateGuideZIndex();
+        
         _showGuide();
         
         guideEnabled = true;
