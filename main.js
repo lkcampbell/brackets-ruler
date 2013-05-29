@@ -42,11 +42,12 @@ define(function (require, exports, module) {
     
     // --- Constants ---
     var RULER_COMMAND_NAME  = "Toggle Ruler",
-        RULER_COMMAND_ID    = "lkcampbell.toggle-ruler",
-        RULER_SHORTCUT_KEY  = "Ctrl-Alt-R";
+        RULER_COMMAND_ID    = "lkcampbell-toggle-ruler",
+        RULER_SHORTCUT_KEY  = "Ctrl-Alt-R",
+        RULER_CONTEXT_MENU  = "lkcampbell-ruler-context-menu";
     
     var GUIDE_COMMAND_NAME  = "Toggle Column Guide",
-        GUIDE_COMMAND_ID    = "lkcampbell.toggle-column-guide",
+        GUIDE_COMMAND_ID    = "lkcampbell-toggle-column-guide",
         GUIDE_SHORTCUT_KEY  = "Ctrl-Alt-G";
     
     var MIN_COLUMNS     = 80,   // Must be multiple of ten
@@ -59,6 +60,7 @@ define(function (require, exports, module) {
                                 guideColumnNum: MIN_COLUMNS },
         _prefs              = PreferencesManager.getPreferenceStorage(module, _defPrefs),
         _viewMenu           = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
+        _rulerContextMenu   = Menus.registerContextMenu(RULER_CONTEXT_MENU),
         _rulerHTML          = require("text!ruler-template.html"),
         _currentDoc         = null,
         _currentEditor      = null,
@@ -554,6 +556,9 @@ define(function (require, exports, module) {
     }
     
     function _handleRulerDragStart(event) {
+        // Only react to the left mouse click
+        if (event.which !== 1) { return; }
+        
         _$rulerPanel.mousemove(_handleRulerDrag);
         _$rulerPanel.mouseup(_handleRulerDragStop);
         _$rulerPanel.mouseenter(_handleRulerMouseEnter);
@@ -635,10 +640,16 @@ define(function (require, exports, module) {
         CommandManager.register(RULER_COMMAND_NAME, RULER_COMMAND_ID, _toggleRuler);
         CommandManager.register(GUIDE_COMMAND_NAME, GUIDE_COMMAND_ID, _toggleColumnGuide);
         
-        // Add to View menu
+        // Add commands to View menu
         if (_viewMenu) {
             _viewMenu.addMenuItem(RULER_COMMAND_ID, RULER_SHORTCUT_KEY);
             _viewMenu.addMenuItem(GUIDE_COMMAND_ID, GUIDE_SHORTCUT_KEY);
+        }
+        
+        // Add commands to Ruler context menu
+        if (_rulerContextMenu) {
+            _rulerContextMenu.addMenuItem(RULER_COMMAND_ID);
+            _rulerContextMenu.addMenuItem(GUIDE_COMMAND_ID);
         }
         
         // Apply user preferences
@@ -658,6 +669,10 @@ define(function (require, exports, module) {
                 _$rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
                 _$rulerPanel.mousedown(_handleRulerDragStart);
                 $("#editor-holder").before(_$rulerPanel);
+                _$rulerPanel.mousedown(_handleRulerDragStart);
+                _$rulerPanel.on("contextmenu", function (e) {
+                    _rulerContextMenu.open(e);
+                });
                 
                 // Create Column Guide
                 _$columnGuide = $("<div id='brackets-ruler-column-guide'></div>");
