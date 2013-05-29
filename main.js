@@ -42,12 +42,12 @@ define(function (require, exports, module) {
     
     // --- Constants ---
     var RULER_COMMAND_NAME  = "Toggle Ruler",
-        RULER_COMMAND_ID    = "lkcampbell-toggle-ruler",
+        RULER_COMMAND_ID    = "lkcampbell.toggleRuler",
         RULER_SHORTCUT_KEY  = "Ctrl-Alt-R",
         RULER_CONTEXT_MENU  = "lkcampbell-ruler-context-menu";
     
     var GUIDE_COMMAND_NAME  = "Toggle Column Guide",
-        GUIDE_COMMAND_ID    = "lkcampbell-toggle-column-guide",
+        GUIDE_COMMAND_ID    = "lkcampbell.toggleColumnGuide",
         GUIDE_SHORTCUT_KEY  = "Ctrl-Alt-G";
     
     var MIN_COLUMNS     = 80,   // Must be multiple of ten
