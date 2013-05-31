@@ -204,17 +204,25 @@ define(function (require, exports, module) {
     function _updateGuideZIndex() {
         var editor      = EditorManager.getCurrentFullEditor(),
             cm          = editor ? editor._codeMirror : null,
-            editorWidth = 0,
             guideXPos   = 0,
+            editorWidth = 0,
             guideZIndex = 0;
         
-        // If the guide falls outside of the bounds of the editor window,
-        // change its z-index so it isn't drawn on top of the main toolbar.
+        // If guide falls outside of the bounds of the editor window, change
+        // its z-index so it isn't drawn on top of side bar or the tool bar.
         if (cm) {
+            guideXPos   = _$columnGuide.position().left;
             editorWidth = cm.getScrollInfo().clientWidth;
             editorWidth = (editorWidth > 0) ? editorWidth : 0;
-            guideXPos   = _$columnGuide.position().left;
-            guideZIndex = (guideXPos <= editorWidth) ? 1 : 0;
+            
+            if ((guideXPos < 0) || (guideXPos > editorWidth)) {
+                // Outside of the editor window bounds
+                guideZIndex = -1;
+            } else {
+                // Inside of the editor window bounds
+                guideZIndex = 1;
+            }
+            
             _$columnGuide.css("z-index", guideZIndex);
         }
     }
