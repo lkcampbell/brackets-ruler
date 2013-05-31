@@ -32,10 +32,6 @@ do not use the SourceCodePro font do not work correctly.  If you find
 a bug with the ruler please make sure you can reproduce the bug while
 using the Default theme before you open an issue on it.
 
-When changing themes with the Themes extension, the ruler scroll does not
-update.  Eventually, this will be addressed, but in the meantime, scroll
-the editor to realign the ruler.
-
 ### Roadmap
 
 Address the Ruler Length performance issues.  The typing speed gets slow when
