@@ -447,6 +447,7 @@ define(function (require, exports, module) {
     function _handleFontSizeChange() {
         _updateTickMarks();
         _updateGuideHeight();
+        _updateGuideZIndex();
     }
     
     function _handleEditorResize() {
