@@ -463,6 +463,10 @@ define(function (require, exports, module) {
         _updateGuideZIndex();
     }
     
+    function _handleThemeChange() {
+        _updateTickMarks();
+    }
+    
     function _handleTextChange() {
         _updateRulerLength();
     }
@@ -670,6 +674,7 @@ define(function (require, exports, module) {
         $(ViewCommandHandlers).on("fontSizeChange", _handleFontSizeChange);
         $(DocumentManager).on("currentDocumentChange", _handleDocumentChange);
         $(PanelManager).on("editorAreaResize", _handleEditorResize);
+        $(ExtensionUtils).on("Themes.themeChanged", _handleThemeChange);
         
         // Load the ruler CSS
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
