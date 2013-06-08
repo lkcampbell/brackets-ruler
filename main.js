@@ -670,12 +670,6 @@ define(function (require, exports, module) {
         CommandManager.get(GUIDE_COMMAND_ID).setChecked(guideEnabled);
         _guideColumnNum = _prefs.getValue("guideColumnNum");
         
-        // Add Event Listeners
-        $(ViewCommandHandlers).on("fontSizeChange", _handleFontSizeChange);
-        $(DocumentManager).on("currentDocumentChange", _handleDocumentChange);
-        $(PanelManager).on("editorAreaResize", _handleEditorResize);
-        $(ExtensionUtils).on("Themes.themeChanged", _handleThemeChange);
-        
         // Load the ruler CSS
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
@@ -690,6 +684,12 @@ define(function (require, exports, module) {
                 // Create Column Guide
                 _$columnGuide = $("<div id='brackets-ruler-column-guide'></div>");
                 $("#editor-holder").prepend(_$columnGuide);
+                
+                // Add Event Listeners
+                $(ViewCommandHandlers).on("fontSizeChange", _handleFontSizeChange);
+                $(DocumentManager).on("currentDocumentChange", _handleDocumentChange);
+                $(PanelManager).on("editorAreaResize", _handleEditorResize);
+                $(ExtensionUtils).on("Themes.themeChanged", _handleThemeChange);
                 
                 // Loading a new document so fire off handler
                 _handleDocumentChange();
