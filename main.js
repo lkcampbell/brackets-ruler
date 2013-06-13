@@ -586,6 +586,16 @@ define(function (require, exports, module) {
         }
     }
     
+    function _handleEditorOptionChange(event, option, value) {
+        console.log("_handleEditorOptionChange() called");
+        console.log("option = %s", option);
+        console.log("value = %s", value);
+        
+        if (option === "lineNumbers") {
+            _updateRulerScroll();
+        }
+    }
+    
     function _handleDocumentChange() {
         var rulerCommand    = CommandManager.get(RULER_COMMAND_ID),
             rulerEnabled    = rulerCommand.getChecked(),
@@ -614,12 +624,14 @@ define(function (require, exports, module) {
         
         if (_currentEditor) {
             $(_currentEditor).off("scroll", _handleEditorScroll);
+            $(_currentEditor).off("optionChange", _handleEditorOptionChange);
         }
         
         _currentEditor = EditorManager.getCurrentFullEditor();
         
         if (_currentEditor) {
             $(_currentEditor).on("scroll", _handleEditorScroll);
+            $(_currentEditor).on("optionChange", _handleEditorOptionChange);
             _editorScrollPos = _currentEditor.getScrollPos();
             _currentEditor.refresh();
         }
