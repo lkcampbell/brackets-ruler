@@ -152,6 +152,73 @@ define(function (require, exports, module) {
         }
     }
     
+    // --- Helper functions ---
+    function _getColumnFromXPos(xPos) {
+        var editor          = EditorManager.getCurrentFullEditor(),
+            cm              = editor ? editor._codeMirror : null,
+            rulerHidden     = _$rulerPanel.is(":hidden"),
+            tickWidth       = 0,
+            columnNumber    = 0;
+        
+        if (cm) {
+            // Can only get the width of an element if it is visible
+            // If the ruler is not visible, show it temporarily...
+            if (rulerHidden) {
+                _showRuler(true);
+            }
+            
+            tickWidth = $("#brackets-ruler #br-tick-mark-left-filler").width();
+            
+            // ...then hide the ruler again
+            if (rulerHidden) {
+                _hideRuler(true);
+            }
+            
+            columnNumber = Math.ceil(xPos / tickWidth);
+            columnNumber = (columnNumber < 0) ? 0 : columnNumber;
+        } else {
+            columnNumber = 0;
+        }
+        
+        return columnNumber;
+    }
+    
+    function _getColumnFromRulerClick(event) {
+        var $allTickMarks   = $(".br-tick-marks").children(),
+            $targetTickMark = null,
+            clickX          = event.pageX,
+            targetID        = "",
+            tickRegExp      = /^br-tick-(\d+)$/,
+            matchResult     = [];
+        
+        $targetTickMark = $allTickMarks.filter(function () {
+            return $(this).offset().left <= clickX;
+        }).filter(function () {
+            return ($(this).offset().left + $(this).outerWidth()) > clickX;
+        });
+        
+        // Take care of the edge cases
+        if ($targetTickMark.length === 0) {
+            if (clickX < $allTickMarks.first().offset().left) {
+                $targetTickMark = $allTickMarks.eq(1);
+            } else {
+                $targetTickMark = $allTickMarks.eq($allTickMarks.length - 2);
+            }
+        }
+        
+        targetID = $targetTickMark.attr("id");
+        
+        if (targetID === "br-tick-mark-left-filler") {
+            targetID = $targetTickMark.next().attr("id");
+        } else if (targetID === "br-tick-mark-right-filler") {
+            targetID = $targetTickMark.prev().attr("id");
+        }
+        
+        matchResult = targetID.match(tickRegExp);
+        
+        return parseInt(matchResult[1], 10);
+    }
+    
     // --- Update Column Guide functions ---
     function _updateGuidePosX() {
         var $tickMark   = null,
@@ -232,7 +299,7 @@ define(function (require, exports, module) {
         var editor              = EditorManager.getCurrentFullEditor(),
             cm                  = editor ? editor._codeMirror : null,
             currentMaxColumns   = 0,
-            maxLineLength       = 0,
+            editorWidth         = 0,
             newMaxColumns       = 0,
             $currentElement     = null,
             $newElement         = null,
@@ -242,24 +309,17 @@ define(function (require, exports, module) {
             $currentElement     = $("#br-number-right-filler").prev();
             currentMaxColumns   = parseInt($currentElement.text(), 10);
             
-            // CodeMirror does not provide the maxLineLength of the document
-            // if word wrap is enabled.  If word wrap is on, this workaround
-            // code flips it off, grabs the maxLineLength, then flips it back
-            // on again.
             if (Editor.getWordWrap()) {
-                // Wrap it in an operation so the word wrap flip can't be seen
-                cm.operation(function () {
-                    Editor.setWordWrap(false);
-                    maxLineLength = cm.display.maxLineLength;
-                    Editor.setWordWrap(true);
-                });
+                // Word wrap on.  Ruler length determined by width of editor.
+                editorWidth = cm.getScrollInfo().clientWidth;
+                newMaxColumns = Math.ceil(_getColumnFromXPos(editorWidth) / 10) * 10;
             } else {
-                maxLineLength = cm.display.maxLineLength;
+                // Word wrap off.  Ruler length determined by longest text line.
+                newMaxColumns = Math.ceil(cm.display.maxLineLength / 10) * 10;
             }
             
-            if (maxLineLength > MIN_COLUMNS) {
-                newMaxColumns = Math.ceil(maxLineLength / 10) * 10;
-            } else {
+            // Ruler needs to be the minimum length
+            if (newMaxColumns < MIN_COLUMNS) {
                 newMaxColumns = MIN_COLUMNS;
             }
             
@@ -403,6 +463,11 @@ define(function (require, exports, module) {
         
         // Tick mark width affects ruler scroll so update scroll
         _updateRulerScroll();
+        
+        // If word wrap is on, update "infinite" ruler when tick marks update
+        if (Editor.getWordWrap()) {
+            _updateRulerLength();
+        }
     }
     
     function _updateAll() {
@@ -459,6 +524,10 @@ define(function (require, exports, module) {
     }
     
     function _handleEditorResize() {
+        if (Editor.getWordWrap()) {
+            _updateRulerLength();
+        }
+        
         _updateGuideHeight();
         _updateGuideZIndex();
     }
@@ -468,7 +537,12 @@ define(function (require, exports, module) {
     }
     
     function _handleTextChange() {
-        _updateRulerLength();
+        if (!Editor.getWordWrap()) {
+            _updateRulerLength();
+        } else {
+            // This shouldn't be happening...
+            console.error("Error: _handleTextChange called with word wrap on.");
+        }
     }
     
     function _handleEditorScroll() {
@@ -483,42 +557,6 @@ define(function (require, exports, module) {
         }
         
         _editorScrollPos = newScrollPos;
-    }
-    
-    function _getTargetColumn(event) {
-        var $allTickMarks   = $(".br-tick-marks").children(),
-            $targetTickMark = null,
-            clickX          = event.pageX,
-            targetID        = "",
-            tickRegExp      = /^br-tick-(\d+)$/,
-            matchResult     = [];
-        
-        $targetTickMark = $allTickMarks.filter(function () {
-            return $(this).offset().left <= clickX;
-        }).filter(function () {
-            return ($(this).offset().left + $(this).outerWidth()) > clickX;
-        });
-        
-        // Take care of the edge cases
-        if ($targetTickMark.length === 0) {
-            if (clickX < $allTickMarks.first().offset().left) {
-                $targetTickMark = $allTickMarks.eq(1);
-            } else {
-                $targetTickMark = $allTickMarks.eq($allTickMarks.length - 2);
-            }
-        }
-        
-        targetID = $targetTickMark.attr("id");
-        
-        if (targetID === "br-tick-mark-left-filler") {
-            targetID = $targetTickMark.next().attr("id");
-        } else if (targetID === "br-tick-mark-right-filler") {
-            targetID = $targetTickMark.prev().attr("id");
-        }
-        
-        matchResult = targetID.match(tickRegExp);
-        
-        return parseInt(matchResult[1], 10);
     }
     
     function _handleRulerDragStop() {
@@ -544,7 +582,7 @@ define(function (require, exports, module) {
         
         _isDragging = true;
         
-        _guideColumnNum = _getTargetColumn(event);
+        _guideColumnNum = _getColumnFromRulerClick(event);
         
         // New guide column number may affect length of ruler
         _updateRulerLength();
@@ -576,7 +614,7 @@ define(function (require, exports, module) {
         _$rulerPanel.mouseup(_handleRulerDragStop);
         _$rulerPanel.mouseenter(_handleRulerMouseEnter);
         
-        if (_guideColumnNum === _getTargetColumn(event)) {
+        if (_guideColumnNum === _getColumnFromRulerClick(event)) {
             // Possibly a simple mouse click to toggle guide
             _isDragging = false;
         } else {
@@ -587,12 +625,23 @@ define(function (require, exports, module) {
     }
     
     function _handleEditorOptionChange(event, option, value) {
-        console.log("_handleEditorOptionChange() called");
-        console.log("option = %s", option);
-        console.log("value = %s", value);
-        
         if (option === "lineNumbers") {
             _updateRulerScroll();
+        } else if (option === "lineWrapping") {
+            if (_currentDoc) {
+                if (Editor.getWordWrap()) {
+                    // Word wrap is on, stopping listening for text changes
+                    $(_currentDoc).off("change", _handleTextChange);
+                    _currentDoc.releaseRef();
+                } else {
+                    // Word wrap is off, start listening for text changes
+                    $(_currentDoc).on("change", _handleTextChange);
+                    _currentDoc.addRef();
+                }
+            }
+            
+            _updateRulerLength();
+            _updateGuideHeight();
         }
     }
     
@@ -603,15 +652,24 @@ define(function (require, exports, module) {
             guideEnabled    = guideCommand.getChecked();
         
         if (_currentDoc) {
-            $(_currentDoc).off("change", _updateRulerLength);
-            _currentDoc.releaseRef();
+            // If wrap is off, ruler length updates on text changes.
+            // Remove the old Text Change event.
+            if (!Editor.getWordWrap()) {
+                $(_currentDoc).off("change", _handleTextChange);
+                _currentDoc.releaseRef();
+            }
         }
         
         _currentDoc = DocumentManager.getCurrentDocument();
         
         if (_currentDoc) {
-            $(_currentDoc).on("change", _handleTextChange);
-            _currentDoc.addRef();
+            // If wrap is off, ruler length updates on text changes.
+            // Add the new Text Change event.
+            if (!Editor.getWordWrap()) {
+                $(_currentDoc).on("change", _handleTextChange);
+                _currentDoc.addRef();
+            }
+            
             CommandManager.get(RULER_COMMAND_ID).setEnabled(true);
             CommandManager.get(GUIDE_COMMAND_ID).setEnabled(true);
         } else {
