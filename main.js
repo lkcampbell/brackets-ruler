@@ -156,12 +156,11 @@ define(function (require, exports, module) {
     // --- Helper functions ---
     function _getColumnFromXPos(xPos) {
         var editor          = EditorManager.getCurrentFullEditor(),
-            cm              = editor ? editor._codeMirror : null,
             rulerHidden     = _$rulerPanel.is(":hidden"),
             tickWidth       = 0,
             columnNumber    = 0;
         
-        if (cm) {
+        if (editor) {
             // Can only get the width of an element if it is visible
             // If the ruler is not visible, show it temporarily...
             if (rulerHidden) {
