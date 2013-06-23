@@ -524,6 +524,8 @@ define(function (require, exports, module) {
     }
     
     function _handleEditorResize() {
+        // If word wrap is on, ruler length is based on width of editor,
+        // so update the ruler length when the editor is resized
         if (Editor.getWordWrap()) {
             _updateRulerLength();
         }
@@ -644,18 +646,6 @@ define(function (require, exports, module) {
         if (option === "lineNumbers") {
             _updateRulerScroll();
         } else if (option === "lineWrapping") {
-            if (_currentDoc) {
-                if (Editor.getWordWrap()) {
-                    // Word wrap is on, stop listening for text changes
-                    $(_currentDoc).off("change", _handleTextChange);
-                    _currentDoc.releaseRef();
-                } else {
-                    // Word wrap is off, start listening for text changes
-                    $(_currentDoc).on("change", _handleTextChange);
-                    _currentDoc.addRef();
-                }
-            }
-            
             _updateRulerLength();
             _updateGuideHeight();
         }
@@ -670,23 +660,15 @@ define(function (require, exports, module) {
             guideEnabled    = guideCommand.getChecked();
         
         if (_currentDoc) {
-            // If wrap is off, ruler length updates on text changes.
-            // Remove the old Text Change event.
-            if (!Editor.getWordWrap()) {
-                $(_currentDoc).off("change", _handleTextChange);
-                _currentDoc.releaseRef();
-            }
+            $(_currentDoc).off("change", _handleTextChange);
+            _currentDoc.releaseRef();
         }
         
         _currentDoc = DocumentManager.getCurrentDocument();
         
         if (_currentDoc) {
-            // If wrap is off, ruler length updates on text changes.
-            // Add the new Text Change event.
-            if (!Editor.getWordWrap()) {
-                $(_currentDoc).on("change", _handleTextChange);
-                _currentDoc.addRef();
-            }
+            $(_currentDoc).on("change", _handleTextChange);
+            _currentDoc.addRef();
             
             CommandManager.get(RULER_COMMAND_ID).setEnabled(true);
             CommandManager.get(GUIDE_COMMAND_ID).setEnabled(true);
