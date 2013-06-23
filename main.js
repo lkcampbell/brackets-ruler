@@ -66,6 +66,7 @@ define(function (require, exports, module) {
         _currentEditor      = null,
         _guideColumnNum     = MIN_COLUMNS,
         _editorScrollPos    = null,
+        _currentGutterWidth = 0,
         _isDragging         = false;
     
     var _$rulerPanel    = null,
@@ -537,11 +538,27 @@ define(function (require, exports, module) {
     }
     
     function _handleTextChange() {
+        var editor          = EditorManager.getCurrentFullEditor(),
+            $scroller       = null,
+            $gutter         = null,
+            newGutterWidth  = 0;
+        
+        // If word wrap is not on, ruler length is based on longest text line,
+        // so update the ruler length when the text changes
         if (!Editor.getWordWrap()) {
             _updateRulerLength();
-        } else {
-            // This shouldn't be happening...
-            console.error("Error: _handleTextChange called with word wrap on.");
+        }
+        
+        if (editor) {
+            // If gutter width changes after text change, update ruler scroll
+            $scroller       = $(editor.getScrollerElement());
+            $gutter         = $scroller.find(".CodeMirror-gutter");
+            newGutterWidth  = $gutter.width();
+            
+            if (_currentGutterWidth !== newGutterWidth) {
+                _currentGutterWidth = newGutterWidth;
+                _updateRulerScroll();
+            }
         }
     }
     
@@ -630,7 +647,7 @@ define(function (require, exports, module) {
         } else if (option === "lineWrapping") {
             if (_currentDoc) {
                 if (Editor.getWordWrap()) {
-                    // Word wrap is on, stopping listening for text changes
+                    // Word wrap is on, stop listening for text changes
                     $(_currentDoc).off("change", _handleTextChange);
                     _currentDoc.releaseRef();
                 } else {
@@ -647,6 +664,8 @@ define(function (require, exports, module) {
     
     function _handleDocumentChange() {
         var rulerCommand    = CommandManager.get(RULER_COMMAND_ID),
+            $scroller       = null,
+            $gutter         = null,
             rulerEnabled    = rulerCommand.getChecked(),
             guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
             guideEnabled    = guideCommand.getChecked();
@@ -690,7 +709,10 @@ define(function (require, exports, module) {
         if (_currentEditor) {
             $(_currentEditor).on("scroll", _handleEditorScroll);
             $(_currentEditor).on("optionChange", _handleEditorOptionChange);
-            _editorScrollPos = _currentEditor.getScrollPos();
+            _editorScrollPos    = _currentEditor.getScrollPos();
+            $scroller           = $(_currentEditor.getScrollerElement());
+            $gutter             = $scroller.find(".CodeMirror-gutter");
+            _currentGutterWidth = $gutter.width();
             _currentEditor.refresh();
         }
         
@@ -761,7 +783,7 @@ define(function (require, exports, module) {
                 $(PanelManager).on("editorAreaResize", _handleEditorResize);
                 $(ExtensionUtils).on("Themes.themeChanged", _handleThemeChange);
                 
-                // Loading a new document so fire off handler
+                // Starting up Brackets loads a new document so fire off handler
                 _handleDocumentChange();
             });
     });
