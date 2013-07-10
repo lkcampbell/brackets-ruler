@@ -41,12 +41,12 @@ define(function (require, exports, module) {
         ExtensionUtils      = brackets.getModule("utils/ExtensionUtils");
     
     // --- Constants ---
-    var RULER_COMMAND_NAME  = "Toggle Ruler",
-        RULER_COMMAND_ID    = "lkcampbell.toggleRuler",
+    var RULER_COMMAND_NAME  = "Column Ruler",
+        RULER_COMMAND_ID    = "lkcampbell.toggleColumnRuler",
         RULER_SHORTCUT_KEY  = "Ctrl-Alt-R",
         RULER_CONTEXT_MENU  = "lkcampbell-ruler-context-menu";
     
-    var GUIDE_COMMAND_NAME  = "Toggle Column Guide",
+    var GUIDE_COMMAND_NAME  = "Column Guide",
         GUIDE_COMMAND_ID    = "lkcampbell.toggleColumnGuide",
         GUIDE_SHORTCUT_KEY  = "Ctrl-Alt-G";
     

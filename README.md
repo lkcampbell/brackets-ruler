@@ -10,10 +10,10 @@ into Extension URL field.
 4. Click on the **Install** button.
 
 ### How to Use Ruler
-Toggle the Column Ruler with **Brackets > View > Toggle Ruler** or use the
+Toggle the Column Ruler with **Brackets > View > Column Ruler** or use the
 shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
 
-Toggle the Column Guide with **Brackets > View > Toggle Column Guide** or
+Toggle the Column Guide with **Brackets > View > Column Guide** or
 use the shortcut key which is **Ctrl-Alt-G** on Windows and **Command-Alt-G**
 on Mac.
 
