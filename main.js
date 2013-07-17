@@ -268,29 +268,44 @@ define(function (require, exports, module) {
         }
     }
     
-    function _updateGuideZIndex() {
-        var editor      = EditorManager.getCurrentFullEditor(),
-            cm          = editor ? editor._codeMirror : null,
-            guideXPos   = 0,
-            editorWidth = 0,
-            guideZIndex = 0;
+    function _updateGuideVisibility() {
+        var editor          = EditorManager.getCurrentFullEditor(),
+            cm              = editor ? editor._codeMirror : null,
+            guideXPos       = 0,
+            editorWidth     = 0,
+            columnHidden    = _$columnGuide.is(":hidden"),
+            guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
+            guideEnabled    = guideCommand.getChecked();
         
-        // If guide falls outside of the bounds of the editor window, change
-        // its z-index so it isn't drawn on top of side bar or the tool bar.
+        // If guide falls outside of the bounds of the editor window, hide it
+        // so it isn't drawn on top of side bar or the tool bar.
         if (cm) {
+            
+            // Can only get the position of an element if it is visible
+            // If the guide is not visible, show it temporarily...
+            if (columnHidden) {
+                _showGuide();
+            }
+            
             guideXPos   = _$columnGuide.position().left;
+            
+            // ...then hide the guide again
+            if (columnHidden) {
+                _hideGuide();
+            }
+            
             editorWidth = cm.getScrollInfo().clientWidth;
             editorWidth = (editorWidth > 0) ? editorWidth : 0;
             
             if ((guideXPos < 0) || (guideXPos > editorWidth)) {
                 // Outside of the editor window bounds
-                guideZIndex = -1;
+                _hideGuide();
             } else {
                 // Inside of the editor window bounds
-                guideZIndex = 1;
+                if (guideEnabled) {
+                    _showGuide();
+                }
             }
-            
-            _$columnGuide.css("z-index", guideZIndex);
         }
     }
     
@@ -483,7 +498,7 @@ define(function (require, exports, module) {
         // --- Update Column Guide ---
         // _updateGuidePosX() is called by _updateRulerScroll()
         _updateGuideHeight();
-        _updateGuideZIndex();
+        _updateGuideVisibility();
     }
     
     // --- Toggle functions ---
@@ -496,7 +511,7 @@ define(function (require, exports, module) {
         
         if (guideEnabled) {
             _showGuide();
-            _updateGuideZIndex();
+            _updateGuideVisibility();
         } else {
             _hideGuide();
         }
@@ -520,7 +535,7 @@ define(function (require, exports, module) {
     function _handleFontSizeChange() {
         _updateTickMarks();
         _updateGuideHeight();
-        _updateGuideZIndex();
+        _updateGuideVisibility();
     }
     
     function _handleEditorResize() {
@@ -531,12 +546,12 @@ define(function (require, exports, module) {
         }
         
         _updateGuideHeight();
-        _updateGuideZIndex();
+        _updateGuideVisibility();
     }
     
     function _handleThemeChange() {
         _updateTickMarks();
-        _updateGuideZIndex();
+        _updateGuideVisibility();
     }
     
     function _handleTextChange() {
@@ -572,7 +587,7 @@ define(function (require, exports, module) {
         // Only update on a horizontal scroll
         if (oldScrollX !== newScrollX) {
             _updateRulerScroll();
-            _updateGuideZIndex();
+            _updateGuideVisibility();
         }
         
         _editorScrollPos = newScrollPos;
@@ -606,7 +621,7 @@ define(function (require, exports, module) {
         // New guide column number may affect length of ruler
         _updateRulerLength();
         _updateGuidePosX();
-        _updateGuideZIndex();
+        _updateGuideVisibility();
         
         _showGuide();
         
@@ -646,7 +661,7 @@ define(function (require, exports, module) {
     function _handleEditorOptionChange(event, option, value) {
         if (option === "lineNumbers") {
             _updateRulerScroll();
-            _updateGuideZIndex();
+            _updateGuideVisibility();
         } else if (option === "lineWrapping") {
             _updateRulerLength();
             _updateGuideHeight();
