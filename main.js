@@ -536,6 +536,7 @@ define(function (require, exports, module) {
     
     function _handleThemeChange() {
         _updateTickMarks();
+        _updateGuideZIndex();
     }
     
     function _handleTextChange() {
@@ -645,6 +646,7 @@ define(function (require, exports, module) {
     function _handleEditorOptionChange(event, option, value) {
         if (option === "lineNumbers") {
             _updateRulerScroll();
+            _updateGuideZIndex();
         } else if (option === "lineWrapping") {
             _updateRulerLength();
             _updateGuideHeight();
