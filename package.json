@@ -17,6 +17,6 @@
         "ruler.css"
     ],
     "engines": {
-        "brackets": ">=0.27.0"
+        "brackets": ">=0.28.0"
     }
 }
