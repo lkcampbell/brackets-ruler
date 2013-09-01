@@ -4,10 +4,8 @@ an adjustable column ruler to the editor.
 
 ### How to Install
 1. Select **Brackets > File > Extension Manager...**
-2. Click on **Install from URL...**
-3. Paste https://github.com/lkcampbell/brackets-ruler
-into Extension URL field.
-4. Click on the **Install** button.
+2. Search for this extension.
+3. Click on the **Install** button.
 
 ### How to Use Ruler
 Toggle the Column Ruler with **Brackets > View > Column Ruler** or use the
