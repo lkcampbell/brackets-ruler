@@ -4,18 +4,13 @@ an adjustable column ruler to the editor.
 
 ### How to Install
 1. Select **Brackets > File > Extension Manager...**
-2. Click on **Install from URL...**
-3. Paste https://github.com/lkcampbell/brackets-ruler
-into Extension URL field.
-4. Click on the **Install** button.
+2. Search for this extension.
+3. Click on the **Install** button.
 
 ### How to Use Ruler
-Toggle the Column Ruler with **Brackets > View > Column Ruler** or use the
-shortcut key which is **Ctrl-Alt-R** on Windows and **Command-Alt-R** on Mac.
+Toggle the Column Ruler with **Brackets > View > Column Ruler**.
 
-Toggle the Column Guide with **Brackets > View > Column Guide** or
-use the shortcut key which is **Ctrl-Alt-G** on Windows and **Command-Alt-G**
-on Mac.
+Toggle the Column Guide with **Brackets > View > Column Guide**.
 
 Click on a column on the ruler to set the guide at that column.
 

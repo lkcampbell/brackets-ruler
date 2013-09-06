@@ -47,8 +47,7 @@ define(function (require, exports, module) {
         RULER_CONTEXT_MENU  = "lkcampbell-ruler-context-menu";
     
     var GUIDE_COMMAND_NAME  = "Column Guide",
-        GUIDE_COMMAND_ID    = "lkcampbell.toggleColumnGuide",
-        GUIDE_SHORTCUT_KEY  = "Ctrl-Alt-G";
+        GUIDE_COMMAND_ID    = "lkcampbell.toggleColumnGuide";
     
     var MIN_COLUMNS     = 80,   // Must be multiple of ten
         MAX_COLUMNS     = 1000, // Must be multiple of ten
@@ -745,8 +744,8 @@ define(function (require, exports, module) {
         
         // Add commands to View menu
         if (_viewMenu) {
-            _viewMenu.addMenuItem(RULER_COMMAND_ID, RULER_SHORTCUT_KEY);
-            _viewMenu.addMenuItem(GUIDE_COMMAND_ID, GUIDE_SHORTCUT_KEY);
+            _viewMenu.addMenuItem(RULER_COMMAND_ID);
+            _viewMenu.addMenuItem(GUIDE_COMMAND_ID);
         }
         
         // Add commands to Ruler context menu
