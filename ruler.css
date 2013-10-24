@@ -62,5 +62,5 @@
     position: absolute;
     overflow: hidden;
     width: 1px;
-    z-index: 1;
+    z-index: 999;
 }
