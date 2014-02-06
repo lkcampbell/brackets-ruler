@@ -658,10 +658,12 @@ define(function (require, exports, module) {
     }
     
     function _handleEditorOptionChange(event, option, value) {
-        if (option === "lineNumbers") {
+        // Update for issue #27: compatible with Sprint 37 Preferences change
+        // and backwards compatible with Sprint 28 and higher
+        if (option === "showLineNumbers" || option === "lineNumbers") {
             _updateRulerScroll();
             _updateGuideVisibility();
-        } else if (option === "lineWrapping") {
+        } else if (option === "wordWrap" || option === "lineWrapping") {
             _updateRulerLength();
             _updateGuideHeight();
         }

@@ -1,7 +1,7 @@
 {
     "name": "brackets-ruler",
     "title": "Column Ruler",
-    "version": "1.1.7",
+    "version": "1.1.8",
     "description": "An adjustable column ruler for Brackets.",
     "homepage": "https://github.com/lkcampbell/brackets-ruler",
     "author": "Lance Campbell lkcampbell@gmail.com (https://github.com/lkcampbell)",
