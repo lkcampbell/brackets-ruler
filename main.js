@@ -1,6 +1,6 @@
 /*
  * The MIT License (MIT)
- * Copyright (c) 2013 Lance Campbell. All rights reserved.
+ * Copyright (c) 2013-2014 Lance Campbell. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,167 +22,86 @@
  *
  */
 
-/*jslint vars: true, plusplus: true, devel: true, regexp: true, nomen: true, indent: 4, maxerr: 50 */
-/*global define, brackets, $, Mustache, window */
+/*global define, brackets, $, window */
 
 define(function (require, exports, module) {
     "use strict";
     
-    // --- Required modules ---
+    // --- Brackets Modules ---
     var PreferencesManager  = brackets.getModule("preferences/PreferencesManager"),
-        Menus               = brackets.getModule("command/Menus"),
-        EditorManager       = brackets.getModule("editor/EditorManager"),
-        Editor              = brackets.getModule("editor/Editor").Editor,
         CommandManager      = brackets.getModule("command/CommandManager"),
+        EditorManager       = brackets.getModule("editor/EditorManager"),
         AppInit             = brackets.getModule("utils/AppInit"),
+        Menus               = brackets.getModule("command/Menus"),
         DocumentManager     = brackets.getModule("document/DocumentManager"),
-        ViewCommandHandlers = brackets.getModule("view/ViewCommandHandlers"),
-        PanelManager        = brackets.getModule("view/PanelManager"),
-        ExtensionUtils      = brackets.getModule("utils/ExtensionUtils");
+        ExtensionUtils      = brackets.getModule("utils/ExtensionUtils"),
+        ViewCommandHandlers = brackets.getModule("view/ViewCommandHandlers");
+    
+    // --- CodeMirror Addons ---
+    brackets.getModule(["thirdparty/CodeMirror2/addon/display/rulers"]);
+    
+    // --- Extension modules ---
+    var Ruler = require("Ruler").Ruler;
     
     // --- Constants ---
+    var EXTENSION_NAME      = "brackets-ruler";
+    
     var RULER_COMMAND_NAME  = "Column Ruler",
         RULER_COMMAND_ID    = "lkcampbell.toggleColumnRuler",
-        RULER_SHORTCUT_KEY  = "Ctrl-Alt-R",
         RULER_CONTEXT_MENU  = "lkcampbell-ruler-context-menu";
     
     var GUIDE_COMMAND_NAME  = "Column Guide",
         GUIDE_COMMAND_ID    = "lkcampbell.toggleColumnGuide";
     
-    var MIN_COLUMNS     = 80,   // Must be multiple of ten
-        MAX_COLUMNS     = 1000, // Must be multiple of ten
-        MAX_NUMBER_SIZE = 12;   // Measured in pixel units
+    var MIN_COLUMNS = 80;
     
-    // --- Private variables ---
-    var _defPrefs           = { rulerEnabled:   false,
-                                guideEnabled:   false,
-                                guideColumnNum: MIN_COLUMNS },
-        _prefs              = PreferencesManager.getPreferenceStorage(module, _defPrefs),
-        _viewMenu           = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
-        _rulerContextMenu   = Menus.registerContextMenu(RULER_CONTEXT_MENU),
-        _rulerHTML          = require("text!ruler-template.html"),
-        _currentDoc         = null,
-        _currentEditor      = null,
-        _guideColumnNum     = MIN_COLUMNS,
-        _editorScrollPos    = null,
-        _currentGutterWidth = 0,
-        _isDragging         = false;
+    // --- Extension Preferences ---
+    var prefs = PreferencesManager.getExtensionPrefs(EXTENSION_NAME);
     
-    var _$rulerPanel    = null,
-        _$columnGuide   = null;
+    prefs.definePreference("rulerEnabled",  "boolean",  false);
+    prefs.definePreference("guideEnabled",  "boolean",  false);
+    prefs.definePreference("guidePosition", "number",   MIN_COLUMNS);
     
-    var _templateFunctions = {
-        "rulerNumber": function () {
-            var i           = 0,
-                finalHTML   = "";
-            
-            for (i = 10; i <= MIN_COLUMNS; i += 10) {
-                finalHTML += "                ";
-                finalHTML += "<td class='br-number' colspan='";
-                finalHTML += (i === MIN_COLUMNS) ? "6" : "9";
-                finalHTML += "'>";
-                finalHTML += i;
-                finalHTML += "</td>";
+    // --- Private Variables ---
+    var editor      = null,
+        cm          = null,
+        ruler       = new Ruler(),
+        $rulerPanel = null,
+        isDragging  = false;
+    
+    // --- Private Functions
+    function applyPrefs() {
+        var rulerEnabled    = prefs.get("rulerEnabled"),
+            guideEnabled    = prefs.get("guideEnabled"),
+            guidePosition   = prefs.get("guidePosition"),
+            guideOptions    = [];
+        
+        // Update Ruler
+        ruler.setEnabled(rulerEnabled);
+        
+        // Update Guide
+        if (cm) {
+            if (guideEnabled) {
+                guideOptions.push({
+                    className:  "brackets-ruler-column-guide",
+                    column:     guidePosition
+                });
                 
-                if (i !== MIN_COLUMNS) {
-                    finalHTML += "\n";
-                    finalHTML += "                ";
-                    finalHTML += "<td class='br-number'></td>";
-                    finalHTML += "\n";
-                }
-            }
-            return finalHTML;
-        },
-        "rulerTickMark": function () {
-            var i           = 0,
-                finalHTML   = '';
-            
-            for (i = 0; i <= MIN_COLUMNS; i++) {
-                finalHTML += '                ';
-                
-                if (i % 5) {
-                    // Minor tick mark
-                    finalHTML += "<td class='br-minor-tick-mark' id='br-tick-";
-                } else {
-                    // Major tick mark
-                    finalHTML += "<td class='br-major-tick-mark' id='br-tick-";
-                }
-                
-                finalHTML += i;
-                finalHTML += "'>&nbsp;</td>";
-                
-                if (i !== MIN_COLUMNS) {
-                    finalHTML += '\n';
-                }
-            }
-            return finalHTML;
-        }
-    };
-    
-    // --- Show/Hide functions ---
-    function _showGuide() {
-        if (_$columnGuide.is(":hidden")) {
-            _$columnGuide.show();
-        }
-    }
-    
-    function _hideGuide() {
-        if (_$columnGuide.is(":visible")) {
-            _$columnGuide.hide();
-        }
-    }
-    
-    function _showRuler(skipResize) {
-        if (_$rulerPanel.is(":hidden")) {
-            _$rulerPanel.show();
-            
-            if (!skipResize) {
-                EditorManager.resizeEditor();
+                cm.setOption("rulers", guideOptions);
+            } else {
+                cm.setOption("rulers", false);
             }
         }
-    }
-    
-    function _hideRuler(skipResize) {
-        if (_$rulerPanel.is(":visible")) {
-            _$rulerPanel.hide();
-            
-            if (!skipResize) {
-                EditorManager.resizeEditor();
-            }
-        }
+        
+        ruler.setGuidePosition(guidePosition);
+        
+        // Update Menu Settings
+        CommandManager.get(RULER_COMMAND_ID).setChecked(rulerEnabled);
+        CommandManager.get(GUIDE_COMMAND_ID).setChecked(guideEnabled);
     }
     
     // --- Helper functions ---
-    function _getColumnFromXPos(xPos) {
-        var editor          = EditorManager.getCurrentFullEditor(),
-            rulerHidden     = _$rulerPanel.is(":hidden"),
-            tickWidth       = 0,
-            columnNumber    = 0;
-        
-        if (editor) {
-            // Can only get the width of an element if it is visible
-            // If the ruler is not visible, show it temporarily...
-            if (rulerHidden) {
-                _showRuler(true);
-            }
-            
-            tickWidth = $("#brackets-ruler #br-tick-mark-left-filler").width();
-            
-            // ...then hide the ruler again
-            if (rulerHidden) {
-                _hideRuler(true);
-            }
-            
-            columnNumber = Math.ceil(xPos / tickWidth);
-            columnNumber = (columnNumber < 0) ? 0 : columnNumber;
-        } else {
-            columnNumber = 0;
-        }
-        
-        return columnNumber;
-    }
-    
-    function _getColumnFromRulerClick(event) {
+    function getColumnFromRulerClick(event) {
         var $allTickMarks   = $(".br-tick-marks").children(),
             $targetTickMark = null,
             clickX          = event.pageX,
@@ -218,572 +137,117 @@ define(function (require, exports, module) {
         return parseInt(matchResult[1], 10);
     }
     
-    // --- Update Column Guide functions ---
-    function _updateGuidePosX() {
-        var $tickMark   = null,
-            $ruler      = null,
-            rulerHidden = false,
-            rulerPosX   = 0,
-            tickPosX    = 0,
-            tickWidth   = 0,
-            guidePosX   = 0;
-        
-        $ruler      = $("#brackets-ruler #br-ruler");
-        $tickMark   = $("#brackets-ruler #br-tick-" + _guideColumnNum);
-        rulerHidden = _$rulerPanel.is(":hidden");
-        
-        // Can only get the position of an element if it is visible
-        // If the ruler is not visible, show it temporarily...
-        if (rulerHidden) {
-            _showRuler(true);
-        }
-        
-        rulerPosX   = $ruler.position().left;
-        tickPosX    = $tickMark.position().left;
-        tickWidth   = $tickMark.width();
-        guidePosX   = rulerPosX + tickPosX + Math.ceil(tickWidth * 0.5);
-        _$columnGuide.css("left", guidePosX + "px");
-        
-        // ...then hide the ruler again
-        if (rulerHidden) {
-            _hideRuler(true);
-        }
-        
-        _prefs.setValue("guideColumnNum", _guideColumnNum);
-    }
-    
-    function _updateGuideHeight() {
-        var editor      = EditorManager.getCurrentFullEditor(),
-            cm          = editor ? editor._codeMirror : null,
-            guideHeight = 0;
-        
-        if (cm) {
-            guideHeight = cm.getScrollInfo().clientHeight;
-            guideHeight = (guideHeight > 0) ? guideHeight : 0;
-            
-            if (_$columnGuide) {
-                _$columnGuide.height(guideHeight);
-            }
-        }
-    }
-    
-    function _updateGuideVisibility() {
-        var editor          = EditorManager.getCurrentFullEditor(),
-            cm              = editor ? editor._codeMirror : null,
-            guideXPos       = 0,
-            editorWidth     = 0,
-            columnHidden    = _$columnGuide.is(":hidden"),
-            guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
-            guideEnabled    = guideCommand.getChecked();
-        
-        // If guide falls outside of the bounds of the editor window, hide it
-        // so it isn't drawn on top of side bar or the tool bar.
-        if (cm) {
-            
-            // Can only get the position of an element if it is visible
-            // If the guide is not visible, show it temporarily...
-            if (columnHidden) {
-                _showGuide();
-            }
-            
-            guideXPos   = _$columnGuide.position().left;
-            
-            // ...then hide the guide again
-            if (columnHidden) {
-                _hideGuide();
-            }
-            
-            editorWidth = cm.getScrollInfo().clientWidth;
-            editorWidth = (editorWidth > 0) ? editorWidth : 0;
-            
-            if ((guideXPos < 0) || (guideXPos > editorWidth)) {
-                // Outside of the editor window bounds
-                _hideGuide();
-            } else {
-                // Inside of the editor window bounds
-                if (guideEnabled) {
-                    _showGuide();
-                }
-            }
-        }
-    }
-    
-    // --- Update Ruler functions ---
-    function _updateRulerLength() {
-        var editor              = EditorManager.getCurrentFullEditor(),
-            cm                  = editor ? editor._codeMirror : null,
-            currentMaxColumns   = 0,
-            editorWidth         = 0,
-            newMaxColumns       = 0,
-            $currentElement     = null,
-            $newElement         = null,
-            i                   = 0;
-        
-        if (cm) {
-            $currentElement     = $("#br-number-right-filler").prev();
-            currentMaxColumns   = parseInt($currentElement.text(), 10);
-            
-            if (Editor.getWordWrap()) {
-                // Word wrap on.  Ruler length determined by width of editor.
-                editorWidth = cm.getScrollInfo().clientWidth;
-                newMaxColumns = Math.ceil(_getColumnFromXPos(editorWidth) / 10) * 10;
-            } else {
-                // Word wrap off.  Ruler length determined by longest text line.
-                newMaxColumns = Math.ceil(cm.display.maxLineLength / 10) * 10;
-            }
-            
-            // Ruler needs to be the minimum length
-            if (newMaxColumns < MIN_COLUMNS) {
-                newMaxColumns = MIN_COLUMNS;
-            }
-            
-            // Ruler must also be long enough to show column guide
-            if (newMaxColumns < _guideColumnNum) {
-                newMaxColumns = Math.ceil(_guideColumnNum / 10) * 10;
-            }
-            
-            // Ruler causes some performance issues if it gets too long
-            if (newMaxColumns > MAX_COLUMNS) {
-                newMaxColumns = MAX_COLUMNS;
-            }
-            
-            if (newMaxColumns < currentMaxColumns) {
-                // Remove Ruler Numbers
-                $currentElement = $("#br-number-right-filler");
-                $currentElement.prev().remove();
-                
-                for (i = (currentMaxColumns - 10); i > newMaxColumns; i -= 10) {
-                    $currentElement.prev().remove();
-                    $currentElement.prev().remove();
-                }
-                
-                $currentElement.prev().remove();
-                $currentElement.prev().attr("colspan", 6);
-                
-                // Remove Ruler Tick Marks
-                $currentElement = $("#br-tick-mark-right-filler");
-                
-                for (i = currentMaxColumns; i > newMaxColumns; i--) {
-                    $currentElement.prev().remove();
-                }
-            } else if (newMaxColumns > currentMaxColumns) {
-                // Add Ruler Numbers
-                $currentElement = $("#br-number-right-filler").prev();
-                $currentElement.attr("colspan", 9);
-                $newElement = $("<td></td>");
-                $newElement.attr("class", "br-number");
-                $currentElement.after($newElement);
-                $currentElement = $currentElement.next();
-                
-                for (i = (currentMaxColumns + 10); i <= newMaxColumns; i += 10) {
-                    $newElement = $("<td></td>");
-                    $newElement.attr("class", "br-number");
-                    
-                    if (i !== newMaxColumns) {
-                        $newElement.attr("colspan", 9);
-                    } else {
-                        $newElement.attr("colspan", 6);
-                    }
-                    
-                    $newElement.text(i);
-                    $currentElement.after($newElement);
-                    $currentElement = $currentElement.next();
-                    
-                    if (i !== newMaxColumns) {
-                        $newElement = $("<td></td>");
-                        $newElement.attr("class", "br-number");
-                        $currentElement = $currentElement.after($newElement);
-                        $currentElement = $currentElement.next();
-                    }
-                }
-                
-                // Add Ruler Tick Marks
-                $currentElement = $("#br-tick-mark-right-filler").prev();
-                
-                for (i = (currentMaxColumns + 1); i <= newMaxColumns; i++) {
-                    $newElement = $("<td></td>");
-                    
-                    if (i % 5) {
-                        // Minor Tick Mark
-                        $newElement.attr("class", "br-minor-tick-mark");
-                    } else {
-                        // Major Tick Mark
-                        $newElement.attr("class", "br-major-tick-mark");
-                    }
-                    
-                    $newElement.attr("id", "br-tick-" + i);
-                    
-                    // Insert non-breaking space character
-                    $newElement.text("\xa0");
-                    
-                    $currentElement.after($newElement);
-                    $currentElement = $currentElement.next();
-                }
-            } // else they are equal so do nothing...
-        }
-    }
-    
-    function _updateRulerScroll() {
-        var editor              = EditorManager.getCurrentFullEditor(),
-            cm                  = editor ? editor._codeMirror : null,
-            rulerHidden         = _$rulerPanel.is(":hidden"),
-            $cmSizer            = null,
-            sizerMarginWidth    = 0,
-            linePaddingWidth    = 0,
-            tickWidth           = 0,
-            rulerOffset         = 0,
-            $ruler              = $("#brackets-ruler #br-ruler");
-        
-        if (cm) {
-            // Can only get the width of an element if it is visible
-            // If the ruler is not visible, show it temporarily...
-            if (rulerHidden) {
-                _showRuler(true);
-            }
-            
-            $cmSizer            = $(cm.getScrollerElement()).find(".CodeMirror-sizer");
-            sizerMarginWidth    = parseInt($cmSizer.css("margin-left"), 10);
-            linePaddingWidth    = parseInt($(".CodeMirror pre").css("padding-left"), 10);
-            tickWidth           = $("#brackets-ruler #br-tick-mark-left-filler").width();
-            rulerOffset         = sizerMarginWidth + linePaddingWidth;
-            rulerOffset         -= Math.ceil(tickWidth * 1.5);
-            rulerOffset         -= cm.getScrollInfo().left;
-            $ruler.css("left", rulerOffset + "px");
-            
-            // ...then hide the ruler again
-            if (rulerHidden) {
-                _hideRuler(true);
-            }
-        } else {
-            $ruler.css("left", "0px");
-        }
-        
-        // Ruler scroll affects guide's horizontal position so update position
-        _updateGuidePosX();
-    }
-    
-    function _updateTickMarks() {
-        var fontSize        = $(".CodeMirror").css("font-size"),
-            $tickMarks      = $("#brackets-ruler .br-tick-marks"),
-            $rulerNumbers   = $("#brackets-ruler .br-numbers");
-        
-        $tickMarks.css("font-size", fontSize);
-        
-        if (parseInt(fontSize, 10) < MAX_NUMBER_SIZE) {
-            $rulerNumbers.css("font-size", fontSize);
-        } else {
-            $rulerNumbers.css("font-size", MAX_NUMBER_SIZE + "px");
-        }
-        
-        // Tick mark width affects ruler scroll so update scroll
-        _updateRulerScroll();
-        
-        // If word wrap is on, update "infinite" ruler when tick marks update
-        if (Editor.getWordWrap()) {
-            _updateRulerLength();
-        }
-    }
-    
-    function _updateAll() {
-        // Note that some of the update functions have dependencies on other
-        // update functions (see comments below), so don't change the calling
-        // order here or things might break.
-        
-        // --- Update Ruler ---
-        _updateTickMarks();
-        // _updateRulerScroll() is called by _updateTickMarks()
-        _updateRulerLength();
-        
-        // --- Update Column Guide ---
-        // _updateGuidePosX() is called by _updateRulerScroll()
-        _updateGuideHeight();
-        _updateGuideVisibility();
-    }
-    
-    // --- Toggle functions ---
-    function _toggleColumnGuide() {
-        var guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
-            guideEnabled    = !guideCommand.getChecked();
-        
-        guideCommand.setChecked(guideEnabled);
-        _prefs.setValue("guideEnabled", guideEnabled);
-        
-        if (guideEnabled) {
-            _showGuide();
-            _updateGuideVisibility();
-        } else {
-            _hideGuide();
-        }
-    }
-    
-    function _toggleRuler() {
-        var rulerCommand    = CommandManager.get(RULER_COMMAND_ID),
-            rulerEnabled    = !rulerCommand.getChecked();
-        
-        rulerCommand.setChecked(rulerEnabled);
-        _prefs.setValue("rulerEnabled", rulerEnabled);
-        
-        if (rulerEnabled) {
-            _showRuler();
-        } else {
-            _hideRuler();
-        }
-    }
-    
     // --- Event Handlers ---
-    function _handleFontSizeChange() {
-        _updateTickMarks();
-        _updateGuideHeight();
-        _updateGuideVisibility();
+    function handlePrefsChange() {
+        applyPrefs();
+        prefs.save();
     }
     
-    function _handleEditorResize() {
-        // If word wrap is on, ruler length is based on width of editor,
-        // so update the ruler length when the editor is resized
-        if (Editor.getWordWrap()) {
-            _updateRulerLength();
-        }
-        
-        _updateGuideHeight();
-        _updateGuideVisibility();
+    function handleToggleRuler() {
+        prefs.set("rulerEnabled", !prefs.get("rulerEnabled"));
     }
     
-    function _handleThemeChange() {
-        _updateTickMarks();
-        _updateGuideVisibility();
+    function handleToggleGuide() {
+        prefs.set("guideEnabled", !prefs.get("guideEnabled"));
     }
     
-    function _handleTextChange() {
-        var editor          = EditorManager.getCurrentFullEditor(),
-            $scroller       = null,
-            $gutter         = null,
-            newGutterWidth  = 0;
-        
-        // If word wrap is not on, ruler length is based on longest text line,
-        // so update the ruler length when the text changes
-        if (!Editor.getWordWrap()) {
-            _updateRulerLength();
-        }
-        
-        if (editor) {
-            // If gutter width changes after text change, update ruler scroll
-            $scroller       = $(editor.getScrollerElement());
-            $gutter         = $scroller.find(".CodeMirror-gutter");
-            newGutterWidth  = $gutter.width();
-            
-            if (_currentGutterWidth !== newGutterWidth) {
-                _currentGutterWidth = newGutterWidth;
-                _updateRulerScroll();
-            }
-        }
+    function handleDocumentChange() {
+        editor  = EditorManager.getCurrentFullEditor();
+        cm      = editor ? editor._codeMirror : null;
+        applyPrefs();
+        ruler.setEditor(editor);
     }
     
-    function _handleEditorScroll() {
-        var oldScrollX      = _editorScrollPos.x,
-            newScrollPos    = _currentEditor.getScrollPos(),
-            newScrollX      = newScrollPos.x;
-        
-        // Only update on a horizontal scroll
-        if (oldScrollX !== newScrollX) {
-            _updateRulerScroll();
-            _updateGuideVisibility();
-        }
-        
-        _editorScrollPos = newScrollPos;
-    }
-    
-    function _handleRulerDragStop() {
-        _$rulerPanel.off("mousemove");
-        _$rulerPanel.off("mouseup");
-        _$rulerPanel.off("mouseenter");
+    function handleRulerDragStop() {
+        $rulerPanel.off("mousemove");
+        $rulerPanel.off("mouseup");
+        $rulerPanel.off("mouseenter");
         
         // No dragging === mouse click: toggle guide
-        if (!_isDragging) {
-            _toggleColumnGuide();
+        if (!isDragging) {
+            handleToggleGuide();
         }
         
-        _isDragging = false;
+        isDragging = false;
     }
     
-    function _handleRulerDrag(event) {
-        var newColumnNum    = MIN_COLUMNS,
-            guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
-            guideEnabled    = false;
-        
+    function handleRulerDrag(event) {
         // When left mouse button is no longer pressed, stop the drag
-        if (event.which !== 1) { _handleRulerDragStop(); }
+        if (event.which !== 1) {
+            handleRulerDragStop();
+        }
         
-        _isDragging = true;
-        
-        _guideColumnNum = _getColumnFromRulerClick(event);
-        
-        // New guide column number may affect length of ruler
-        _updateRulerLength();
-        _updateGuidePosX();
-        _updateGuideVisibility();
-        
-        _showGuide();
-        
-        guideEnabled = true;
-        guideCommand.setChecked(guideEnabled);
-        
-        _prefs.setValue("guideEnabled", guideEnabled);
-        _prefs.setValue("guideColumnNum", _guideColumnNum);
+        isDragging = true;
+        prefs.set("guidePosition", getColumnFromRulerClick(event));
     }
     
-    function _handleRulerMouseEnter(event) {
+    function handleRulerMouseEnter(event) {
         if (event.which === 1) {
-            _handleRulerDrag();
+            handleRulerDrag();
         } else {
-            _handleRulerDragStop();
+            handleRulerDragStop();
         }
     }
     
-    function _handleRulerDragStart(event) {
+    function handleRulerDragStart(event) {
         // Only react to the left mouse click
         if (event.which !== 1) { return; }
         
-        _$rulerPanel.mousemove(_handleRulerDrag);
-        _$rulerPanel.mouseup(_handleRulerDragStop);
-        _$rulerPanel.mouseenter(_handleRulerMouseEnter);
+        $rulerPanel.mousemove(handleRulerDrag);
+        $rulerPanel.mouseup(handleRulerDragStop);
+        $rulerPanel.mouseenter(handleRulerMouseEnter);
         
-        if (_guideColumnNum === _getColumnFromRulerClick(event)) {
+        if (prefs.get("guidePosition") === getColumnFromRulerClick(event)) {
             // Possibly a simple mouse click to toggle guide
-            _isDragging = false;
+            isDragging = false;
         } else {
             // Definitely not a toggle, start the drag column reset
-            _isDragging = true;
-            _handleRulerDrag(event);
-        }
-    }
-    
-    function _handleEditorOptionChange(event, option, value) {
-        // Update for issue #27: compatible with Sprint 37 Preferences change
-        // and backwards compatible with Sprint 28 and higher
-        if (option === "showLineNumbers" || option === "lineNumbers") {
-            _updateRulerScroll();
-            _updateGuideVisibility();
-        } else if (option === "wordWrap" || option === "lineWrapping") {
-            _updateRulerLength();
-            _updateGuideHeight();
-        }
-    }
-    
-    function _handleDocumentChange() {
-        var rulerCommand    = CommandManager.get(RULER_COMMAND_ID),
-            $scroller       = null,
-            $gutter         = null,
-            rulerEnabled    = rulerCommand.getChecked(),
-            guideCommand    = CommandManager.get(GUIDE_COMMAND_ID),
-            guideEnabled    = guideCommand.getChecked();
-        
-        if (_currentDoc) {
-            $(_currentDoc).off("change", _handleTextChange);
-            _currentDoc.releaseRef();
-        }
-        
-        _currentDoc = DocumentManager.getCurrentDocument();
-        
-        if (_currentDoc) {
-            $(_currentDoc).on("change", _handleTextChange);
-            _currentDoc.addRef();
-            
-            CommandManager.get(RULER_COMMAND_ID).setEnabled(true);
-            CommandManager.get(GUIDE_COMMAND_ID).setEnabled(true);
-        } else {
-            _hideRuler();
-            _hideGuide();
-            CommandManager.get(RULER_COMMAND_ID).setEnabled(false);
-            CommandManager.get(GUIDE_COMMAND_ID).setEnabled(false);
-            return;
-        }
-        
-        if (_currentEditor) {
-            $(_currentEditor).off("scroll", _handleEditorScroll);
-            $(_currentEditor).off("optionChange", _handleEditorOptionChange);
-        }
-        
-        _currentEditor = EditorManager.getCurrentFullEditor();
-        
-        if (_currentEditor) {
-            $(_currentEditor).on("scroll", _handleEditorScroll);
-            $(_currentEditor).on("optionChange", _handleEditorOptionChange);
-            _editorScrollPos    = _currentEditor.getScrollPos();
-            $scroller           = $(_currentEditor.getScrollerElement());
-            $gutter             = $scroller.find(".CodeMirror-gutter");
-            _currentGutterWidth = $gutter.width();
-            _currentEditor.refresh();
-        }
-        
-        // Update Ruler and Column Guide
-        _updateAll();
-        
-        // Show/Hide Ruler
-        if (rulerEnabled) {
-            _showRuler();
-        } else {
-            _hideRuler();
-        }
-        
-        EditorManager.resizeEditor();
-        
-        // Show/Hide Column Guide
-        if (guideEnabled) {
-            _showGuide();
-        } else {
-            _hideGuide();
+            isDragging = true;
+            handleRulerDrag(event);
         }
     }
     
     // --- Initialize Extension ---
     AppInit.appReady(function () {
-        var rulerEnabled    = _prefs.getValue("rulerEnabled"),
-            guideEnabled    = _prefs.getValue("guideEnabled");
+        var viewMenu            = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
+            rulerContextMenu    = Menus.registerContextMenu(RULER_CONTEXT_MENU);
         
-        // Register commands
-        CommandManager.register(RULER_COMMAND_NAME, RULER_COMMAND_ID, _toggleRuler);
-        CommandManager.register(GUIDE_COMMAND_NAME, GUIDE_COMMAND_ID, _toggleColumnGuide);
+        // Register toggle commands and add them to menus
+        CommandManager.register(RULER_COMMAND_NAME, RULER_COMMAND_ID, handleToggleRuler);
+        CommandManager.register(GUIDE_COMMAND_NAME, GUIDE_COMMAND_ID, handleToggleGuide);
         
-        // Add commands to View menu
-        if (_viewMenu) {
-            _viewMenu.addMenuItem(RULER_COMMAND_ID);
-            _viewMenu.addMenuItem(GUIDE_COMMAND_ID);
+        if (viewMenu) {
+            viewMenu.addMenuItem(RULER_COMMAND_ID);
+            viewMenu.addMenuItem(GUIDE_COMMAND_ID);
         }
         
-        // Add commands to Ruler context menu
-        if (_rulerContextMenu) {
-            _rulerContextMenu.addMenuItem(RULER_COMMAND_ID);
-            _rulerContextMenu.addMenuItem(GUIDE_COMMAND_ID);
+        if (rulerContextMenu) {
+            rulerContextMenu.addMenuItem(RULER_COMMAND_ID);
+            rulerContextMenu.addMenuItem(GUIDE_COMMAND_ID);
         }
         
-        // Apply user preferences
-        CommandManager.get(RULER_COMMAND_ID).setChecked(rulerEnabled);
-        CommandManager.get(GUIDE_COMMAND_ID).setChecked(guideEnabled);
-        _guideColumnNum = _prefs.getValue("guideColumnNum");
+        // Add Event Listeners
+        $(DocumentManager).on("currentDocumentChange", handleDocumentChange);
+        prefs.on("change", handlePrefsChange);
+        $(ViewCommandHandlers).on("fontSizeChange", function () {
+            ruler.refresh();
+        });
         
-        // Load the ruler CSS
+        // Load Style Sheet and User Interface
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
-                // Create Ruler
-                _$rulerPanel = $(Mustache.render(_rulerHTML, _templateFunctions));
-                $("#editor-holder").before(_$rulerPanel);
-                _$rulerPanel.mousedown(_handleRulerDragStart);
-                _$rulerPanel.on("contextmenu", function (e) {
-                    _rulerContextMenu.open(e);
+                // Create Ruler UI
+                $rulerPanel = ruler.createRulerPanel();
+                
+                // Add Event Listeners to Ruler Panel
+                $rulerPanel.on("contextmenu", function (e) {
+                    rulerContextMenu.open(e);
                 });
                 
-                // Create Column Guide
-                _$columnGuide = $("<div id='brackets-ruler-column-guide'></div>");
-                $("#editor-holder").prepend(_$columnGuide);
+                $rulerPanel.mousedown(handleRulerDragStart);
                 
-                // Add Event Listeners
-                $(ViewCommandHandlers).on("fontSizeChange", _handleFontSizeChange);
-                $(DocumentManager).on("currentDocumentChange", _handleDocumentChange);
-                $(PanelManager).on("editorAreaResize", _handleEditorResize);
-                $(ExtensionUtils).on("Themes.themeChanged", _handleThemeChange);
-                
-                // Starting up Brackets loads a new document so fire off handler
-                _handleDocumentChange();
+                // Starting up Brackets: Fire a Document Change Event
+                handleDocumentChange();
             });
     });
 });

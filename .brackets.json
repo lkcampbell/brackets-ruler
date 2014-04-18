@@ -1,0 +1,18 @@
+{
+    "jslint.options": {
+        "vars": true,
+        "plusplus": true,
+        "devel": true,
+        "nomen": true,
+        "maxerr": 50
+    },
+    "path": {
+        "*.md": {
+            "spaceUnits": 2,
+            "wordWrap": true,
+            "brackets-indent-guides.enabled": false,
+            "linting.enabled": true,
+            "showLineNumbers": true
+        }
+    }
+}
