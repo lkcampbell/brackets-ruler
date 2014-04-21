@@ -21,7 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
-
+/*jslint vars: true, plusplus: true, devel: true, regexp: true, nomen: true, indent: 4, maxerr: 50 */
 /*global define, brackets, $, window */
 
 define(function (require, exports, module) {
@@ -77,8 +77,6 @@ define(function (require, exports, module) {
         },
         
         setEditor: function (editor) {
-            var self = this;
-            
             // This should **NEVER** happen but just in case...
             if ((editor) && (this.editor === editor)) {
                 console.error("Ruler.setEditor is **NOT CHANGING** to new editor.");
@@ -101,19 +99,18 @@ define(function (require, exports, module) {
                 // Add Event Listeners
                 this.cm.off("viewportChange");
                 this.cm.on("viewportChange", function () {
-                    return self.refresh();
-                });
+                    this.refresh();
+                }.bind(this));
                 
                 this.cm.off("scroll");
                 this.cm.on("scroll", function () {
-                    return self.refresh();
-                });
+                    this.refresh();
+                }.bind(this));
                 
                 this.cm.off("change");
                 this.cm.on("change", function () {
-                    return self.refresh();
-                });
-                
+                    this.refresh();
+                }.bind(this));
             } else {
                 // Clear state information
                 this.editor = null;
