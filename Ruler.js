@@ -205,6 +205,7 @@ define(function (require, exports, module) {
             // Line up tickmark zero with column one
             this.scrollX  = 0;
             this.scrollX += this.cmGutterWidth;
+            this.scrollX += parseInt($(".CodeMirror pre").css("padding-left"), 10);
             this.scrollX -= Math.ceil(this.tickmarkWidth * 1.5);
             this.scrollX -= this.cm.getScrollInfo().left;
             

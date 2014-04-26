@@ -479,6 +479,7 @@ define(function (require, exports, module) {
                     tickmarkWidth   =   testWindow.$("#brackets-ruler #br-tick-0").width();
                     rulerScroll     =   testWindow.$("#brackets-ruler #br-ruler").offset().left;
                     rulerScroll     +=  Math.ceil(tickmarkWidth * 1.5);
+                    rulerScroll     -=  parseInt(testWindow.$(".CodeMirror pre").css("padding-left"), 10);
                     editorScroll    =   testWindow.$(".CodeMirror-code").offset().left;
                     expect(rulerScroll).toEqual(editorScroll);
                     
