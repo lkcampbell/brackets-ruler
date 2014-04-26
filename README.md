@@ -50,11 +50,11 @@ can be run from within a development build of Brackets:
 
 ### Known Issues
 
-**Working with other extensions:** Any extensions that changes the font family of
+**Working with other extensions:** Any extensions that change the font family of
 the editor (i.e. Themes, Fonts) from the default Brackets font of Source Code Pro
 will make this extension act incorrectly, especially if the font is not monospace.
 There is no good way to listen for font family change events right now in Brackets
-or in Codemirror, so I have to address these issues directly with the other extension
+or in CodeMirror, so I have to address these issues directly with the other extension
 developers on a case-by-case basis.
 
 ### License

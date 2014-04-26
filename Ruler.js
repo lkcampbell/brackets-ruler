@@ -71,6 +71,19 @@ define(function (require, exports, module) {
             return this.$panel;
         },
         
+        updateEventListeners: function () {
+            var self            = this,
+                refreshRuler    = function () { self.refresh(); };
+            
+            this.cm.off("viewportChange", refreshRuler);
+            this.cm.off("scroll", refreshRuler);
+            this.cm.off("change", refreshRuler);
+            
+            this.cm.on("viewportChange", refreshRuler);
+            this.cm.on("scroll", refreshRuler);
+            this.cm.on("change", refreshRuler);
+        },
+        
         setEnabled: function (enabled) {
             this.enabled = enabled;
             this.updateVisibility();
@@ -96,21 +109,8 @@ define(function (require, exports, module) {
                 this.cmWidth            = $(this.cm.display.sizer).width();
                 this.cmMaxLineLength    = this.cm.display.maxLineLength;
                 
-                // Add Event Listeners
-                this.cm.off("viewportChange");
-                this.cm.on("viewportChange", function () {
-                    this.refresh();
-                }.bind(this));
-                
-                this.cm.off("scroll");
-                this.cm.on("scroll", function () {
-                    this.refresh();
-                }.bind(this));
-                
-                this.cm.off("change");
-                this.cm.on("change", function () {
-                    this.refresh();
-                }.bind(this));
+                // Update Event Listeners
+                this.updateEventListeners();
             } else {
                 // Clear state information
                 this.editor = null;
