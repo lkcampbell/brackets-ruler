@@ -171,8 +171,8 @@ define(function (require, exports, module) {
                 $tickMarks      = $("#brackets-ruler .br-tick-marks"),
                 $rulerNumbers   = $("#brackets-ruler .br-numbers"),
                 rulerHidden     = this.$panel.is(":hidden"),
-                $tickmarkZero   = $("#brackets-ruler #br-tick-0"),
-                $ruler          = $("#brackets-ruler #br-ruler");
+                $tickmarkZero   = $("#brackets-ruler .br-tick-0"),
+                $ruler          = $("#brackets-ruler .br-ruler");
             
             // Set the font size of the tickmarks and the ruler numbers
             this.tickmarkFontSize = this.cmFontSize;
@@ -200,7 +200,7 @@ define(function (require, exports, module) {
         },
         
         updateScrollX: function () {
-            var $ruler = $("#brackets-ruler #br-ruler");
+            var $ruler = $("#brackets-ruler .br-ruler");
             
             // Line up tickmark zero with column one
             this.scrollX  = 0;
@@ -246,7 +246,7 @@ define(function (require, exports, module) {
             
             if (newLength < this.length) {
                 // Remove Ruler Numbers
-                $currentElement = $("#br-number-right-filler");
+                $currentElement = $("#brackets-ruler .br-number-right-filler");
                 $currentElement.prev().remove();
                 
                 for (i = (this.length - 10); i > newLength; i -= 10) {
@@ -258,14 +258,14 @@ define(function (require, exports, module) {
                 $currentElement.prev().attr("colspan", 6);
                 
                 // Remove Ruler Tick Marks
-                $currentElement = $("#br-tick-mark-right-filler");
+                $currentElement = $("#brackets-ruler .br-tick-mark-right-filler");
                 
                 for (i = this.length; i > newLength; i--) {
                     $currentElement.prev().remove();
                 }
             } else if (newLength > this.length) {
                 // Add Ruler Numbers
-                $currentElement = $("#br-number-right-filler").prev();
+                $currentElement = $("#brackets-ruler .br-number-right-filler").prev();
                 $currentElement.attr("colspan", 9);
                 $newElement = $("<td></td>");
                 $newElement.attr("class", "br-number");
@@ -295,21 +295,19 @@ define(function (require, exports, module) {
                 }
                 
                 // Add Ruler Tick Marks
-                $currentElement = $("#br-tick-mark-right-filler").prev();
+                $currentElement = $("#brackets-ruler .br-tick-mark-right-filler").prev();
                 
                 for (i = (this.length + 1); i <= newLength; i++) {
                     $newElement = $("<td></td>");
                     
                     if (i % 5) {
                         // Minor Tick Mark
-                        $newElement.attr("class", "br-minor-tick-mark");
+                        $newElement.attr("class", "br-minor-tick-mark br-tick-" + i);
                     } else {
                         // Major Tick Mark
-                        $newElement.attr("class", "br-major-tick-mark");
+                        $newElement.attr("class", "br-major-tick-mark br-tick-" + i);
                     }
-                    
-                    $newElement.attr("id", "br-tick-" + i);
-                    
+
                     // Insert non-breaking space character
                     $newElement.text("\xa0");
                     

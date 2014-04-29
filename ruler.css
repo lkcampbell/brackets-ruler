@@ -13,7 +13,7 @@
     overflow: hidden;
 }
 
-#brackets-ruler #br-ruler {
+#brackets-ruler .br-ruler {
     border-collapse: collapse;
     border-spacing: 0;
     position: relative;
@@ -52,11 +52,12 @@
     background-color: #8e9a9d;
 }
 
-#brackets-ruler #br-tick-mark-left-filler:before,
-#brackets-ruler #br-tick-mark-right-filler:before {
+#brackets-ruler .br-tick-mark-left-filler:before,
+#brackets-ruler .br-tick-mark-right-filler:before {
     display: none;
 }
 
 .brackets-ruler-column-guide {
+    border-left: 1px solid rgb(128, 128, 128);
     border-left: 1px solid rgba(128, 128, 128, 0.5);
 }

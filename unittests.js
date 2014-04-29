@@ -476,8 +476,8 @@ define(function (require, exports, module) {
                     CommandManager.execute(Commands.TOGGLE_LINE_NUMBERS);
                     
                     // Ruler Scroll should EQUAL Editor Scroll
-                    tickmarkWidth   =   testWindow.$("#brackets-ruler #br-tick-0").width();
-                    rulerScroll     =   testWindow.$("#brackets-ruler #br-ruler").offset().left;
+                    tickmarkWidth   =   testWindow.$("#brackets-ruler .br-tick-0").width();
+                    rulerScroll     =   testWindow.$("#brackets-ruler .br-ruler").offset().left;
                     rulerScroll     +=  Math.ceil(tickmarkWidth * 1.5);
                     rulerScroll     -=  parseInt(testWindow.$(".CodeMirror pre").css("padding-left"), 10);
                     editorScroll    =   testWindow.$(".CodeMirror-code").offset().left;
@@ -487,8 +487,8 @@ define(function (require, exports, module) {
                     CommandManager.execute(Commands.TOGGLE_LINE_NUMBERS);
                     
                     // Ruler Scroll should EQUAL Editor Scroll
-                    tickmarkWidth   =   testWindow.$("#brackets-ruler #br-tick-0").width();
-                    rulerScroll     =   testWindow.$("#brackets-ruler #br-ruler").offset().left;
+                    tickmarkWidth   =   testWindow.$("#brackets-ruler .br-tick-0").width();
+                    rulerScroll     =   testWindow.$("#brackets-ruler .br-ruler").offset().left;
                     rulerScroll     +=  Math.ceil(tickmarkWidth * 1.5);
                     editorScroll    =   testWindow.$(".CodeMirror-code").offset().left;
                     expect(rulerScroll).toEqual(editorScroll);
@@ -533,8 +533,8 @@ define(function (require, exports, module) {
                     rulerScrolled   = false;
                     
                     // Ruler Scroll should EQUAL Editor Scroll
-                    tickmarkWidth   =   testWindow.$("#brackets-ruler #br-tick-0").width();
-                    rulerScroll     =   testWindow.$("#brackets-ruler #br-ruler").offset().left;
+                    tickmarkWidth   =   testWindow.$("#brackets-ruler .br-tick-0").width();
+                    rulerScroll     =   testWindow.$("#brackets-ruler .br-ruler").offset().left;
                     rulerScroll     +=  Math.ceil(tickmarkWidth * 1.5);
                     editorScroll    =   testWindow.$(".CodeMirror-code").offset().left;
                     expect(rulerScroll).toEqual(editorScroll);
@@ -558,8 +558,8 @@ define(function (require, exports, module) {
                 
                 runs(function () {
                     // Ruler Scroll should EQUAL Editor Scroll
-                    tickmarkWidth   =   testWindow.$("#brackets-ruler #br-tick-0").width();
-                    rulerScroll     =   testWindow.$("#brackets-ruler #br-ruler").offset().left;
+                    tickmarkWidth   =   testWindow.$("#brackets-ruler .br-tick-0").width();
+                    rulerScroll     =   testWindow.$("#brackets-ruler .br-ruler").offset().left;
                     rulerScroll     +=  Math.ceil(tickmarkWidth * 1.5);
                     editorScroll    =   testWindow.$(".CodeMirror-code").offset().left;
                     expect(rulerScroll).toEqual(editorScroll);
@@ -591,7 +591,7 @@ define(function (require, exports, module) {
                 
                 // Ruler Length (No Word Wrap) should be 80
                 runs(function () {
-                    rulerLength = testWindow.$("#br-number-right-filler").prev().text();
+                    rulerLength = testWindow.$("#brackets-ruler .br-number-right-filler").prev().text();
                     rulerLength = parseInt(rulerLength, 10);
                     expect(rulerLength).toBe(80);
                 });
@@ -615,7 +615,7 @@ define(function (require, exports, module) {
                 
                 // Ruler Length (No Word Wrap) should be 1000
                 runs(function () {
-                    rulerLength = testWindow.$("#br-number-right-filler").prev().text();
+                    rulerLength = testWindow.$("#brackets-ruler .br-number-right-filler").prev().text();
                     rulerLength = parseInt(rulerLength, 10);
                     expect(rulerLength).toBe(1000);
                 });
@@ -639,7 +639,7 @@ define(function (require, exports, module) {
                 
                 // Ruler Length (No Word Wrap) should be 100
                 runs(function () {
-                    rulerLength = testWindow.$("#br-number-right-filler").prev().text();
+                    rulerLength = testWindow.$("#brackets-ruler .br-number-right-filler").prev().text();
                     rulerLength = parseInt(rulerLength, 10);
                     expect(rulerLength).toBe(100);
                 });
@@ -666,7 +666,7 @@ define(function (require, exports, module) {
                 
                 // Ruler Length (No Word Wrap) should be 90
                 runs(function () {
-                    rulerLength = testWindow.$("#br-number-right-filler").prev().text();
+                    rulerLength = testWindow.$("#brackets-ruler .br-number-right-filler").prev().text();
                     rulerLength = parseInt(rulerLength, 10);
                     expect(rulerLength).toBe(90);
                 });

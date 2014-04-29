@@ -105,7 +105,7 @@ define(function (require, exports, module) {
         var $allTickMarks   = $(".br-tick-marks").children(),
             $targetTickMark = null,
             clickX          = event.pageX,
-            targetID        = "",
+            targetClass     = "",
             tickRegExp      = /^br-tick-(\d+)$/,
             matchResult     = [];
         
@@ -124,15 +124,15 @@ define(function (require, exports, module) {
             }
         }
         
-        targetID = $targetTickMark.attr("id");
+        targetClass = $targetTickMark.attr("class").split(" ")[1];
         
-        if (targetID === "br-tick-mark-left-filler") {
-            targetID = $targetTickMark.next().attr("id");
-        } else if (targetID === "br-tick-mark-right-filler") {
-            targetID = $targetTickMark.prev().attr("id");
+        if (targetClass === "br-tick-mark-left-filler") {
+            targetClass = $targetTickMark.next().attr("class").split(" ")[1];
+        } else if (targetClass === "br-tick-mark-right-filler") {
+            targetClass = $targetTickMark.prev().attr("class").split(" ")[1];
         }
         
-        matchResult = targetID.match(tickRegExp);
+        matchResult = targetClass.match(tickRegExp);
         
         return parseInt(matchResult[1], 10);
     }
