@@ -51,7 +51,9 @@ define(function (require, exports, module) {
         RULER_CONTEXT_MENU  = "lkcampbell-ruler-context-menu";
     
     var GUIDE_COMMAND_NAME  = "Column Guide",
-        GUIDE_COMMAND_ID    = "lkcampbell.toggleColumnGuide";
+        GUIDE_COMMAND_ID    = "lkcampbell.toggleColumnGuide",
+        GUIDE_COLOR         = "rgba(128, 128, 128, 0.5)",
+        GUIDE_CLASS         = "brackets-ruler-column-guide";
     
     var MIN_COLUMNS = 80;
     
@@ -61,6 +63,7 @@ define(function (require, exports, module) {
     prefs.definePreference("rulerEnabled",  "boolean",  false);
     prefs.definePreference("guideEnabled",  "boolean",  false);
     prefs.definePreference("guidePosition", "number",   MIN_COLUMNS);
+    prefs.definePreference("guideColor",    "string",   GUIDE_COLOR);
     
     // --- Private Variables ---
     var editor      = null,
@@ -74,6 +77,8 @@ define(function (require, exports, module) {
         var rulerEnabled    = prefs.get("rulerEnabled"),
             guideEnabled    = prefs.get("guideEnabled"),
             guidePosition   = prefs.get("guidePosition"),
+            guideColor      = prefs.get("guideColor"),
+            guideCSS      = GUIDE_CLASS,
             guideOptions    = [];
         
         // Update Ruler
@@ -82,12 +87,14 @@ define(function (require, exports, module) {
         // Update Guide
         if (cm) {
             if (guideEnabled) {
+
                 guideOptions.push({
-                    className:  "brackets-ruler-column-guide",
+                    className:  GUIDE_CLASS,
                     column:     guidePosition
                 });
                 
                 cm.setOption("rulers", guideOptions);
+                $("." + GUIDE_CLASS).css("border-left-color", guideColor);
             } else {
                 cm.setOption("rulers", false);
             }
@@ -154,8 +161,9 @@ define(function (require, exports, module) {
     function handleDocumentChange() {
         editor  = EditorManager.getCurrentFullEditor();
         cm      = editor ? editor._codeMirror : null;
-        applyPrefs();
+
         ruler.setEditor(editor);
+        applyPrefs();
     }
     
     function handleRulerDragStop() {
