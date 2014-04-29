@@ -23,10 +23,12 @@
 #brackets-ruler .br-numbers {
     color: #ffffff;
     font-size: 110%;
+    font-weight: bold;
 }
 
 #brackets-ruler .br-number {
     text-align: center;
+    padding-left: 2px;
 }
 
 #brackets-ruler .br-tick-marks {
