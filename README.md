@@ -37,8 +37,7 @@ or greater. Values that exceed the length of the column ruler are rounded to
 the highest number on the ruler.
 
 **`brackets-ruler.guideColor`** *(string)*<br/>
-The color of the column guide as defined by a column number that is zero
-or greater. Accepts any valid CSS Color Value formats.
+The color of the column guide. Accepts any valid CSS Color Value format.
 
 For more information on setting preferences see:
 [How to Use Brackets - Preferences](https://github.com/adobe/brackets/wiki/How-to-Use-Brackets#preferences)
