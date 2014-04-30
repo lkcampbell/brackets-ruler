@@ -9,7 +9,6 @@
 }
 
 #brackets-ruler {
-    font-family: "SourceCodePro-Medium", "ＭＳ ゴシック", "MS Gothic", monospace;
     background-color: #3C3F41;
     overflow: hidden;
 }
@@ -23,7 +22,6 @@
 
 #brackets-ruler .br-numbers {
     color: #ffffff;
-    font-weight: bold;
 }
 
 #brackets-ruler .br-number {
@@ -31,6 +29,7 @@
 }
 
 #brackets-ruler .br-tick-marks {
+    font-family: "SourceCodePro-Medium", "ＭＳ ゴシック", "MS Gothic", monospace;
     line-height: 0;
 }
 

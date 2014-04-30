@@ -39,6 +39,10 @@ the highest number on the ruler.
 **`brackets-ruler.guideColor`** *(string)*<br/>
 The color of the column guide. Accepts any valid CSS Color Value format.
 
+**`brackets-ruler.guideLineStyle`** *(string)*<br/>
+The line style of the column guide. Values should be one of the following:
+`"solid"`, `"dotted"`, or `"dashed"`.
+
 For more information on setting preferences see:
 [How to Use Brackets - Preferences](https://github.com/adobe/brackets/wiki/How-to-Use-Brackets#preferences)
 

@@ -53,6 +53,7 @@ define(function (require, exports, module) {
     var GUIDE_COMMAND_NAME  = "Column Guide",
         GUIDE_COMMAND_ID    = "lkcampbell.toggleColumnGuide",
         GUIDE_COLOR         = "rgba(128, 128, 128, 0.5)",
+        GUIDE_LINE_STYLE    = "solid",
         GUIDE_CLASS         = "brackets-ruler-column-guide";
     
     var MIN_COLUMNS = 80;
@@ -60,10 +61,12 @@ define(function (require, exports, module) {
     // --- Extension Preferences ---
     var prefs = PreferencesManager.getExtensionPrefs(EXTENSION_NAME);
     
-    prefs.definePreference("rulerEnabled",  "boolean",  false);
-    prefs.definePreference("guideEnabled",  "boolean",  false);
-    prefs.definePreference("guidePosition", "number",   MIN_COLUMNS);
-    prefs.definePreference("guideColor",    "string",   GUIDE_COLOR);
+    prefs.definePreference("rulerEnabled",      "boolean",  false);
+    prefs.definePreference("guideEnabled",      "boolean",  false);
+    prefs.definePreference("guidePosition",     "number",   MIN_COLUMNS);
+    prefs.definePreference("guideColor",        "string",   GUIDE_COLOR);
+    prefs.definePreference("guideLineStyle",    "string",   GUIDE_LINE_STYLE);
+
     
     // --- Private Variables ---
     var editor      = null,
@@ -78,7 +81,7 @@ define(function (require, exports, module) {
             guideEnabled    = prefs.get("guideEnabled"),
             guidePosition   = prefs.get("guidePosition"),
             guideColor      = prefs.get("guideColor"),
-            guideCSS      = GUIDE_CLASS,
+            guideLineStyle  = prefs.get("guideLineStyle"),
             guideOptions    = [];
         
         // Update Ruler
@@ -87,7 +90,6 @@ define(function (require, exports, module) {
         // Update Guide
         if (cm) {
             if (guideEnabled) {
-
                 guideOptions.push({
                     className:  GUIDE_CLASS,
                     column:     guidePosition
@@ -95,6 +97,7 @@ define(function (require, exports, module) {
                 
                 cm.setOption("rulers", guideOptions);
                 $("." + GUIDE_CLASS).css("border-left-color", guideColor);
+                $("." + GUIDE_CLASS).css("border-left-style", guideLineStyle);
             } else {
                 cm.setOption("rulers", false);
             }
