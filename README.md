@@ -36,11 +36,8 @@ The position of the column guide as defined by a column number that is zero
 or greater. Values that exceed the length of the column ruler are rounded to
 the highest number on the ruler.
 
-**`brackets-ruler.guideColor`** *(string)*<br/>
-The color of the column guide. Accepts any valid CSS Color Value format.
-
 **`brackets-ruler.guideLineStyle`** *(string)*<br/>
-The line style of the column guide. Values should be one of the following:
+The line style of the column guide. Values can be one of the following:
 `"solid"`, `"dotted"`, or `"dashed"`.
 
 For more information on setting preferences see:
