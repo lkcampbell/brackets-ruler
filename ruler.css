@@ -55,18 +55,3 @@
 #brackets-ruler .br-tick-mark-right-filler:before {
     display: none;
 }
-
-.brackets-ruler-column-guide {
-    border-left: 1px solid rgb(128, 128, 128);
-    border-left: 1px solid rgba(128, 128, 128, 0.5);
-}
-
-.brackets-ruler-column-guide-dashed {
-    border-left: 1px dashed rgb(128, 128, 128);
-    border-left: 1px dashed rgba(128, 128, 128, 0.5);
-}
-
-.brackets-ruler-column-guide-dotted {
-    border-left: 1px dotted rgb(128, 128, 128);
-    border-left: 1px dotted rgba(128, 128, 128, 0.5);
-}

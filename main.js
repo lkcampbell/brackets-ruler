@@ -80,6 +80,7 @@ define(function (require, exports, module) {
         var rulerEnabled    = prefs.get("rulerEnabled"),
             guideEnabled    = prefs.get("guideEnabled"),
             guidePosition   = prefs.get("guidePosition"),
+            guideColor      = prefs.get("guideColor"),
             guideLineStyle  = prefs.get("guideLineStyle"),
             guideClass      = "",
             guideOptions    = [];
@@ -90,22 +91,9 @@ define(function (require, exports, module) {
         // Update Guide
         if (cm) {
             if (guideEnabled) {
-                switch (guideLineStyle) {
-                case "solid":
-                    guideClass = GUIDE_CLASS;
-                    break;
-                case "dashed":
-                    guideClass = GUIDE_CLASS + "-dashed";
-                    break;
-                case "dotted":
-                    guideClass = GUIDE_CLASS + "-dotted";
-                    break;
-                default:
-                    guideClass = GUIDE_CLASS;
-                }
-
                 guideOptions.push({
-                    className:  guideClass,
+                    color:      guideColor,
+                    lineStyle:  guideLineStyle,
                     column:     guidePosition
                 });
                 
