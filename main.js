@@ -237,26 +237,26 @@ define(function (require, exports, module) {
             rulerContextMenu.addMenuItem(GUIDE_COMMAND_ID);
         }
         
-        // Add Event Listeners
-        $(DocumentManager).on("currentDocumentChange", handleDocumentChange);
-        prefs.on("change", handlePrefsChange);
-        $(ViewCommandHandlers).on("fontSizeChange", function () {
-            ruler.refresh();
-        });
-        
-        // Load Style Sheet and User Interface
+        // Load Style Sheet, User Interface, and Event Listeners
         ExtensionUtils.loadStyleSheet(module, "ruler.css")
             .done(function () {
                 // Create Ruler UI
                 $rulerPanel = ruler.createRulerPanel();
                 
-                // Add Event Listeners to Ruler Panel
+                // Add Ruler Panel Event Listeners
                 $rulerPanel.on("contextmenu", function (e) {
                     rulerContextMenu.open(e);
                 });
                 
                 $rulerPanel.mousedown(handleRulerDragStart);
                 
+                // Add General Event Listeners
+                $(DocumentManager).on("currentDocumentChange", handleDocumentChange);
+                prefs.on("change", handlePrefsChange);
+                $(ViewCommandHandlers).on("fontSizeChange", function () {
+                    ruler.refresh();
+                });
+
                 // Starting up Brackets: Fire a Document Change Event
                 handleDocumentChange();
             });
