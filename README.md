@@ -68,4 +68,4 @@ developers on a case-by-case basis.
 MIT-licensed -- see `main.js` for details.
 
 ### Compatibility
-Tested on Brackets Sprint 40 and later, Mac OSX Mavericks.
+Tested on Brackets Sprint 44 and later, Mac OSX Mavericks.
