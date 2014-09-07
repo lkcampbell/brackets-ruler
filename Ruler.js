@@ -159,7 +159,7 @@ define(function (require, exports, module) {
         updateVisibility: function () {
             var isSingleView    = (MainViewManager.getPaneCount() === 1),
                 editorExists    = this.cm ? true : false;
-
+            
             // For now, ruler is visible only if a single view editor exists
             this.visible = (isSingleView && editorExists);
             
@@ -311,7 +311,7 @@ define(function (require, exports, module) {
                         // Major Tick Mark
                         $newElement.attr("class", "br-major-tick-mark br-tick-" + i);
                     }
-
+                    
                     // Insert non-breaking space character
                     $newElement.text("\xa0");
                     

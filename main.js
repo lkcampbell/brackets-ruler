@@ -102,7 +102,13 @@ define(function (require, exports, module) {
             } else {
                 cm.setOption("rulers", false);
             }
+            
+            // For now, guide will only be visible in single view mode
+            if (MainViewManager.getPaneCount() !== 1) {
+                cm.setOption("rulers", false);
+            }
         }
+        
         
         ruler.setGuidePosition(guidePosition);
         
@@ -165,7 +171,7 @@ define(function (require, exports, module) {
     function handleDocumentChange() {
         editor  = EditorManager.getCurrentFullEditor();
         cm      = editor ? editor._codeMirror : null;
-
+        
         ruler.setEditor(editor);
         applyPrefs();
     }
@@ -253,17 +259,20 @@ define(function (require, exports, module) {
                 
                 // Add General Event Listeners
                 $(DocumentManager).on("currentDocumentChange", handleDocumentChange);
-
+                
                 prefs.on("change", handlePrefsChange);
-
+                
                 $(ViewCommandHandlers).on("fontSizeChange", function () {
-                    ruler.updateVisibility();
+                    ruler.refresh();
                 });
-
+                
                 $(MainViewManager).on("paneCreate paneDestroy", function () {
+                    // Update ruler and guide visibility.
+                    // For now, they will only be visible in single view mode.
                     ruler.updateVisibility();
+                    applyPrefs();
                 });
-
+                
                 // Starting up Brackets: Fire a Document Change Event
                 handleDocumentChange();
             });
