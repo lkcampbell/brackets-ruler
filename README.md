@@ -64,6 +64,10 @@ There is no good way to listen for font family change events right now in Bracke
 or in CodeMirror, so I have to address these issues directly with the other extension
 developers on a case-by-case basis.
 
+**Ruler disappears in Split View mode:** For now, the Column Ruler extension only
+works when there is a single view in the editor. Displaying multiple rulers in
+multiple views will be part of future functionality.
+
 ### License
 MIT-licensed -- see `main.js` for details.
 
