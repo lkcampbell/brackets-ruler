@@ -1,40 +1,40 @@
-#brackets-ruler table,
-#brackets-ruler tbody,
-#brackets-ruler tr,
-#brackets-ruler td {
+.brackets-ruler table,
+.brackets-ruler tbody,
+.brackets-ruler tr,
+.brackets-ruler td {
     margin: 0;
     padding: 0;
     border: 0;
     font: inherit;
 }
 
-#brackets-ruler {
+.brackets-ruler {
     background-color: #3C3F41;
     overflow: hidden;
 }
 
-#brackets-ruler .br-ruler {
+.brackets-ruler .br-ruler {
     border-collapse: collapse;
     border-spacing: 0;
     position: relative;
     width: 0;
 }
 
-#brackets-ruler .br-numbers {
+.brackets-ruler .br-numbers {
     color: #ffffff;
 }
 
-#brackets-ruler .br-number {
+.brackets-ruler .br-number {
     text-align: center;
 }
 
-#brackets-ruler .br-tick-marks {
+.brackets-ruler .br-tick-marks {
     font-family: "SourceCodePro-Medium", "ＭＳ ゴシック", "MS Gothic", monospace;
     line-height: 0;
 }
 
-#brackets-ruler .br-major-tick-mark:before,
-#brackets-ruler .br-minor-tick-mark:before {
+.brackets-ruler .br-major-tick-mark:before,
+.brackets-ruler .br-minor-tick-mark:before {
     content: "";
     position: relative;
     display: block;
@@ -43,15 +43,15 @@
     width: 1px;
 }
 
-#brackets-ruler .br-major-tick-mark:before {
+.brackets-ruler .br-major-tick-mark:before {
     background-color: #ffffff;
 }
 
-#brackets-ruler .br-minor-tick-mark:before {
+.brackets-ruler .br-minor-tick-mark:before {
     background-color: #8e9a9d;
 }
 
-#brackets-ruler .br-tick-mark-left-filler:before,
-#brackets-ruler .br-tick-mark-right-filler:before {
+.brackets-ruler .br-tick-mark-left-filler:before,
+.brackets-ruler .br-tick-mark-right-filler:before {
     display: none;
 }
