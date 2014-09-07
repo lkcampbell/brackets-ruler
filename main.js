@@ -35,7 +35,8 @@ define(function (require, exports, module) {
         Menus               = brackets.getModule("command/Menus"),
         DocumentManager     = brackets.getModule("document/DocumentManager"),
         ExtensionUtils      = brackets.getModule("utils/ExtensionUtils"),
-        ViewCommandHandlers = brackets.getModule("view/ViewCommandHandlers");
+        ViewCommandHandlers = brackets.getModule("view/ViewCommandHandlers"),
+        MainViewManager     = brackets.getModule("view/MainViewManager");
     
     // --- CodeMirror Addons ---
     brackets.getModule(["thirdparty/CodeMirror2/addon/display/rulers"]);
@@ -252,9 +253,15 @@ define(function (require, exports, module) {
                 
                 // Add General Event Listeners
                 $(DocumentManager).on("currentDocumentChange", handleDocumentChange);
+
                 prefs.on("change", handlePrefsChange);
+
                 $(ViewCommandHandlers).on("fontSizeChange", function () {
-                    ruler.refresh();
+                    ruler.updateVisibility();
+                });
+
+                $(MainViewManager).on("paneCreate paneDestroy", function () {
+                    ruler.updateVisibility();
                 });
 
                 // Starting up Brackets: Fire a Document Change Event

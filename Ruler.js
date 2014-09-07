@@ -29,7 +29,8 @@ define(function (require, exports, module) {
     
     // --- Brackets Modules ---
     var Editor          = brackets.getModule("editor/Editor").Editor,
-        EditorManager   = brackets.getModule("editor/EditorManager");
+        EditorManager   = brackets.getModule("editor/EditorManager"),
+        MainViewManager = brackets.getModule("view/MainViewManager");
     
     // --- Constants ---
     var MIN_COLUMNS         = 80,       // Must be multiple of ten
@@ -67,7 +68,6 @@ define(function (require, exports, module) {
     Ruler.prototype = {
         createRulerPanel: function () {
             this.$panel = $(RULER_HTML);
-//            $("#editor-holder").before(this.$panel);
             $("#first-pane").prepend(this.$panel);
             return this.$panel;
         },
@@ -157,8 +157,11 @@ define(function (require, exports, module) {
         },
         
         updateVisibility: function () {
-            // Don't show ruler if there is no Codemirror Editor
-            this.visible = this.cm ? true : false;
+            var isSingleView    = (MainViewManager.getPaneCount() === 1),
+                editorExists    = this.cm ? true : false;
+
+            // For now, ruler is visible only if a single view editor exists
+            this.visible = (isSingleView && editorExists);
             
             if (this.enabled && this.visible) {
                 this.show();
