@@ -68,7 +68,7 @@ define(function (require, exports, module) {
     Ruler.prototype = {
         createRulerPanel: function () {
             this.$panel = $(RULER_HTML);
-            $("#first-pane").prepend(this.$panel);
+            $("#editor-holder").before(this.$panel);
             return this.$panel;
         },
         
