@@ -244,7 +244,7 @@ define(function (require, exports, module) {
                 });
                 
                 runs(function () {
-                    $guide = testWindow.$(".brackets-ruler-column-guide");
+                    $guide = testWindow.$(".CodeMirror-ruler");
                     
                     // Column Guide Visibility should be FALSE
                     expect($guide.is(":visible")).toBeFalsy();
@@ -265,7 +265,7 @@ define(function (require, exports, module) {
                 });
                 
                 runs(function () {
-                    $guide = testWindow.$(".brackets-ruler-column-guide");
+                    $guide = testWindow.$(".CodeMirror-ruler");
                     
                     // Column Guide Visibility should be TRUE
                     expect($guide.is(":visible")).toBeTruthy();
@@ -324,6 +324,7 @@ define(function (require, exports, module) {
         
         describe("Ruler Tickmark Font Size", function () {
             var prefs               = null,
+                fontPrefs           = null,
                 filePath            = "",
                 promise             = null,
                 tickmarkFontSize    = "",
@@ -331,6 +332,7 @@ define(function (require, exports, module) {
             
             it("should EQUAL Editor Font Size after CHANGING Editor Font Size", function () {
                 prefs       = PreferencesManager.getExtensionPrefs(EXTENSION_NAME);
+                fontPrefs   = PreferencesManager.getExtensionPrefs("fonts");
                 filePath    = testPath + "/test.txt";
                 
                 // Enable the ruler
@@ -350,7 +352,7 @@ define(function (require, exports, module) {
                     
                     // Ruler Tickmark Font Size should EQUAL Editor Font Size
                     tickmarkFontSize    = testWindow.$(".brackets-ruler .br-tick-marks").css("font-size");
-                    editorFontSize      = PreferencesManager.getViewState("fontSizeStyle");
+                    editorFontSize      = fontPrefs.get("fontSize");
                     expect(tickmarkFontSize).toEqual(editorFontSize);
                     
                     // Restore Editor Font Size to default size (12px)
@@ -363,7 +365,7 @@ define(function (require, exports, module) {
                     
                     // Ruler Tickmark Font Size should EQUAL Editor Font Size
                     tickmarkFontSize    = testWindow.$(".brackets-ruler .br-tick-marks").css("font-size");
-                    editorFontSize      = PreferencesManager.getViewState("fontSizeStyle");
+                    editorFontSize      = fontPrefs.get("fontSize");
                     expect(tickmarkFontSize).toEqual(editorFontSize);
                     
                     // Restore Editor Font Size to default size (12px)
@@ -374,6 +376,7 @@ define(function (require, exports, module) {
         
         describe("Ruler Number Font Size", function () {
             var prefs               = null,
+                fontPrefs           = null,
                 filePath            = "",
                 promise             = null,
                 numberFontSize      = "",
@@ -381,6 +384,7 @@ define(function (require, exports, module) {
             
             it("should EQUAL Editor Font Size when Editor Font Size is LESS THAN 14 pixels", function () {
                 prefs       = PreferencesManager.getExtensionPrefs(EXTENSION_NAME);
+                fontPrefs   = PreferencesManager.getExtensionPrefs("fonts");
                 filePath    = testPath + "/test.txt";
                 
                 // Enable the ruler
@@ -405,7 +409,7 @@ define(function (require, exports, module) {
                     
                     // Number Font Size should EQUAL Editor Font Size
                     numberFontSize  = testWindow.$(".brackets-ruler .br-numbers").css("font-size");
-                    editorFontSize  = PreferencesManager.getViewState("fontSizeStyle");
+                    editorFontSize  = fontPrefs.get("fontSize");
                     expect(numberFontSize).toEqual(editorFontSize);
                     
                     // Restore Editor Font Size to default size (12px)
@@ -451,6 +455,7 @@ define(function (require, exports, module) {
             var prefs               = null,
                 filePath            = "",
                 promise             = null,
+                delayDone           = false,
                 tickmarkWidth       = 0,
                 rulerScroll         = 0,
                 editorScroll        = 0,
@@ -475,6 +480,17 @@ define(function (require, exports, module) {
                     // CHANGING Gutter Width by toggling Line Numbers
                     CommandManager.execute(Commands.TOGGLE_LINE_NUMBERS);
                     
+                    // Small delay allows ruler to finish scrolling
+                    setTimeout(function () {
+                        delayDone = true;
+                    }, 500);
+                });
+                
+                waitsFor(function () { return delayDone; }, "delayDone", 5000);
+                
+                runs(function () {
+                    delayDone = false;
+                    
                     // Ruler Scroll should EQUAL Editor Scroll
                     tickmarkWidth   =   testWindow.$(".brackets-ruler .br-tick-0").width();
                     rulerScroll     =   testWindow.$(".brackets-ruler .br-ruler").offset().left;
@@ -482,10 +498,21 @@ define(function (require, exports, module) {
                     rulerScroll     -=  parseInt(testWindow.$(".CodeMirror pre").css("padding-left"), 10);
                     editorScroll    =   testWindow.$(".CodeMirror-code").offset().left;
                     expect(rulerScroll).toEqual(editorScroll);
-                    
+                });
+                
+                runs(function () {
                     // CHANGING Gutter Width by toggling Line Numbers
                     CommandManager.execute(Commands.TOGGLE_LINE_NUMBERS);
                     
+                    // Small delay allows ruler to finish scrolling
+                    setTimeout(function () {
+                        delayDone = true;
+                    }, 500);
+                });
+                
+                waitsFor(function () { return delayDone; }, "delayDone", 5000);
+                
+                runs(function () {
                     // Ruler Scroll should EQUAL Editor Scroll
                     tickmarkWidth   =   testWindow.$(".brackets-ruler .br-tick-0").width();
                     rulerScroll     =   testWindow.$(".brackets-ruler .br-ruler").offset().left;
