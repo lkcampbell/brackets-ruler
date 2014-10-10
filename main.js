@@ -67,7 +67,6 @@ define(function (require, exports, module) {
     prefs.definePreference("guidePosition",     "number",   MIN_COLUMNS);
     prefs.definePreference("guideColor",        "string",   GUIDE_COLOR);
     prefs.definePreference("guideLineStyle",    "string",   GUIDE_LINE_STYLE);
-
     
     // --- Private Variables ---
     var editor      = null,
@@ -108,7 +107,6 @@ define(function (require, exports, module) {
                 cm.setOption("rulers", false);
             }
         }
-        
         
         ruler.setGuidePosition(guidePosition);
         

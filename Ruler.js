@@ -106,7 +106,7 @@ define(function (require, exports, module) {
                 this.editorWordWrap     = Editor.getWordWrap();
                 
                 this.cmFontSize         = $(this.cm.getWrapperElement()).css("font-size");
-                this.cmGutterWidth      = $(this.cm.getGutterElement()).width();
+                this.cmGutterWidth      = $(this.cm.getGutterElement()).outerWidth();
                 this.cmWidth            = $(this.cm.display.sizer).width();
                 this.cmMaxLineLength    = this.cm.display.maxLineLength;
                 
@@ -340,8 +340,8 @@ define(function (require, exports, module) {
                 }
                 
                 // Gutter width changed: update scrollX
-                if (this.cmGutterWidth !== $(this.cm.getGutterElement()).width()) {
-                    this.cmGutterWidth = $(this.cm.getGutterElement()).width();
+                if (this.cmGutterWidth !== $(this.cm.getGutterElement()).outerWidth()) {
+                    this.cmGutterWidth = $(this.cm.getGutterElement()).outerWidth();
                     this.updateScrollX();
                 }
                 
