@@ -33,7 +33,6 @@ define(function (require, exports, module) {
         EditorManager       = brackets.getModule("editor/EditorManager"),
         AppInit             = brackets.getModule("utils/AppInit"),
         Menus               = brackets.getModule("command/Menus"),
-        DocumentManager     = brackets.getModule("document/DocumentManager"),
         ExtensionUtils      = brackets.getModule("utils/ExtensionUtils"),
         ViewCommandHandlers = brackets.getModule("view/ViewCommandHandlers"),
         MainViewManager     = brackets.getModule("view/MainViewManager");
@@ -256,7 +255,7 @@ define(function (require, exports, module) {
                 $rulerPanel.mousedown(handleRulerDragStart);
                 
                 // Add General Event Listeners
-                $(DocumentManager).on("currentDocumentChange", handleDocumentChange);
+                $(MainViewManager).on("currentFileChange", handleDocumentChange);
                 
                 prefs.on("change", handlePrefsChange);
                 

@@ -72,4 +72,4 @@ multiple views will be part of future functionality.
 MIT-licensed -- see `main.js` for details.
 
 ### Compatibility
-Tested on Brackets Sprint 44 and later, Mac OSX Mavericks.
+Tested on Brackets Release 1.0.0 Mac OSX (Mavericks).

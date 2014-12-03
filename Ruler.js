@@ -28,9 +28,9 @@ define(function (require, exports, module) {
     "use strict";
     
     // --- Brackets Modules ---
-    var Editor          = brackets.getModule("editor/Editor").Editor,
-        EditorManager   = brackets.getModule("editor/EditorManager"),
-        MainViewManager = brackets.getModule("view/MainViewManager");
+    var Editor              = brackets.getModule("editor/Editor").Editor,
+        WorkspaceManager    = brackets.getModule("view/WorkspaceManager"),
+        MainViewManager     = brackets.getModule("view/MainViewManager");
     
     // --- Constants ---
     var MIN_COLUMNS         = 80,       // Must be multiple of ten
@@ -145,14 +145,14 @@ define(function (require, exports, module) {
         show: function () {
             if (this.$panel.is(":hidden")) {
                 this.$panel.show();
-                EditorManager.resizeEditor();
+                WorkspaceManager.recomputeLayout();
             }
         },
         
         hide: function () {
             if (this.$panel.is(":visible")) {
                 this.$panel.hide();
-                EditorManager.resizeEditor();
+                WorkspaceManager.recomputeLayout();
             }
         },
         
