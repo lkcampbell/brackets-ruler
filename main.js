@@ -198,7 +198,7 @@ define(function (require, exports, module) {
     
     function handleRulerMouseEnter(event) {
         if (event.which === 1) {
-            handleRulerDrag();
+            handleRulerDrag(event);
         } else {
             handleRulerDragStop();
         }
