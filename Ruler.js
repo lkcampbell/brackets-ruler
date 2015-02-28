@@ -76,13 +76,11 @@ define(function (require, exports, module) {
             var self            = this,
                 refreshRuler    = function () { self.refresh(); };
             
-            this.cm.off("viewportChange", refreshRuler);
             this.cm.off("scroll", refreshRuler);
-            this.cm.off("change", refreshRuler);
-            
-            this.cm.on("viewportChange", refreshRuler);
+            this.cm.off("update", refreshRuler);
+
             this.cm.on("scroll", refreshRuler);
-            this.cm.on("change", refreshRuler);
+            this.cm.on("update", refreshRuler);
         },
         
         setEnabled: function (enabled) {
