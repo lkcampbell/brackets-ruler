@@ -255,15 +255,15 @@ define(function (require, exports, module) {
                 $rulerPanel.mousedown(handleRulerDragStart);
                 
                 // Add General Event Listeners
-                $(MainViewManager).on("currentFileChange", handleDocumentChange);
+                MainViewManager.on("currentFileChange", handleDocumentChange);
                 
                 prefs.on("change", handlePrefsChange);
                 
-                $(ViewCommandHandlers).on("fontSizeChange", function () {
+                ViewCommandHandlers.on("fontSizeChange", function () {
                     ruler.refresh();
                 });
                 
-                $(MainViewManager).on("paneCreate paneDestroy", function () {
+                MainViewManager.on("paneCreate paneDestroy", function () {
                     // Update ruler and guide visibility.
                     // For now, they will only be visible in single view mode.
                     ruler.updateVisibility();
