@@ -46,6 +46,23 @@ The line style of the column guide. Values can be one of the following:
 For more information on setting preferences see:
 [How to Use Brackets - Preferences](https://github.com/adobe/brackets/wiki/How-to-Use-Brackets#preferences)
 
+### Custom Key Bindings
+
+If you would like to add a customized keyboard shortcut to toggle the column ruler,
+set your shortcut key to the following command id: `lkcampbell.toggleColumnRuler`.
+
+If you would like to add a customized keyboard shortcut to toggle the column guide,
+set your shortcut key to the following command id: `lkcampbell.toggleColumnGuide`.
+
+For example, if you want the shortcut `Ctrl-Shift-R` to toggle the column ruler
+and you want the shortcut `Ctrl-Shift-G` to toggle the column guide, type the
+following entry into the `overrides` section of your `keyboardmap.json` file:
+
+`"Ctrl-Shift-R": "lkcampbell.toggleColumnRuler"`
+`"Ctrl-Shift-G": "lkcampbell.toggleColumnGuide"`
+
+For more information on setting Custom Key Bindings see [User Key Bindings](https://github.com/adobe/brackets/wiki/User-Key-Bindings).
+
 ### Unit Testing
 
 This extension comes with a [Jasmine](http://jasmine.github.io/) test suite that
