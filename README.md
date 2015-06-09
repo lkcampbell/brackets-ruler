@@ -56,10 +56,12 @@ set your shortcut key to the following command id: `lkcampbell.toggleColumnGuide
 
 For example, if you want the shortcut `Ctrl-Shift-R` to toggle the column ruler
 and you want the shortcut `Ctrl-Shift-G` to toggle the column guide, type the
-following entry into the `overrides` section of your `keyboardmap.json` file:
+following entries into the `overrides` section of your `keyboardmap.json` file:
 
-`"Ctrl-Shift-R": "lkcampbell.toggleColumnRuler"`
-`"Ctrl-Shift-G": "lkcampbell.toggleColumnGuide"`
+```
+"Ctrl-Shift-R": "lkcampbell.toggleColumnRuler",
+"Ctrl-Shift-G": "lkcampbell.toggleColumnGuide"
+```
 
 For more information on setting Custom Key Bindings see [User Key Bindings](https://github.com/adobe/brackets/wiki/User-Key-Bindings).
 
