@@ -89,6 +89,3 @@ multiple views will be part of future functionality.
 
 ### License
 MIT-licensed -- see `main.js` for details.
-
-### Compatibility
-Tested on Brackets Release 1.0.0 Mac OSX (Mavericks).

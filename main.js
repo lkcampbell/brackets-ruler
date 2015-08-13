@@ -61,11 +61,26 @@ define(function (require, exports, module) {
     // --- Extension Preferences ---
     var prefs = PreferencesManager.getExtensionPrefs(EXTENSION_NAME);
     
-    prefs.definePreference("rulerEnabled",      "boolean",  false);
-    prefs.definePreference("guideEnabled",      "boolean",  false);
-    prefs.definePreference("guidePosition",     "number",   MIN_COLUMNS);
-    prefs.definePreference("guideColor",        "string",   GUIDE_COLOR);
-    prefs.definePreference("guideLineStyle",    "string",   GUIDE_LINE_STYLE);
+    prefs.definePreference("rulerEnabled", "boolean", false, {
+        description: "If the value of this preference is true, the column ruler will be visible. If the value is false, the column ruler will be hidden."
+    });
+    
+    prefs.definePreference("guideEnabled", "boolean", false, {
+        description: "If the value of this preference is true, the column guide will be visible. If the value is false, the column guide will be hidden."
+    });
+    
+    prefs.definePreference("guidePosition", "number", MIN_COLUMNS, {
+        description: "The position of the column guide as defined by a column number that is zero or greater. Values that exceed the length of the column ruler are rounded to the highest number on the ruler."
+    });
+    
+    prefs.definePreference("guideColor", "string", GUIDE_COLOR, {
+        description: "The color of the column guide. Can be any valid CSS Color value."
+    });
+    
+    prefs.definePreference("guideLineStyle", "string", GUIDE_LINE_STYLE, {
+        description: 'The line style of the column guide. Values can be one of the following: "solid", "dotted", or "dashed".',
+        values: ["solid", "dotted", "dashed"]
+    });
     
     // --- Private Variables ---
     var editor      = null,
